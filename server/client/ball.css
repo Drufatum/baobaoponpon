@@ -3,4 +3,10 @@ canvas {
     background-color: #fdfdfd;
     display: block;
     margin: 40px auto;
-  }
+}
+.menu{
+  display: block;
+}
+.game{
+  display:None;
+}

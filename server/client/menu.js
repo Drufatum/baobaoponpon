@@ -1,18 +1,9 @@
-const socket = io(
-    location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "https://bow-8ssn.onrender.com"
-);
 const myId=[""];
-//我開房，並昭告天下
 //catchI是捉i的意思
 function catchI(data,n){
-    
-    const rooms=document.getElementById("room").querySelectorAll(".room");
-    for(let i=0;i<rooms.length;i+=1){
-        document.getElementById("room").removeChild(rooms[i]);
-    }
-    
+    document.querySelectorAll(".room").forEach(elem=>{
+        document.getElementById("room").removeChild(elem);
+    });
     for(let i=0;i<n;i+=1){
         if(data[i]["creatorId"]==myId[0]){
             const cancel=document.createElement("button");
@@ -34,6 +25,9 @@ function catchI(data,n){
             document.getElementById("room").appendChild(button);
             button.textContent=data[i]["name"];
             button.classList.add("room");
+            button.addEventListener("click",()=>{
+                socket.emit("match",data[i]);
+            });
         }
     }
 
@@ -44,7 +38,6 @@ function clear(){
 }
 document.getElementById("createRoom").addEventListener("click",()=>{
     let name="genshin";
-    
     socket.emit("createRoom",name);
 });
 document.getElementById("clear").addEventListener("click",clear);
@@ -52,3 +45,14 @@ socket.on("yourId",(data)=>{
     myId[0]=data;
 });
 socket.on("catchI",catchI);
+socket.on("gameStart",(data)=>{
+
+  document.querySelectorAll(".game").forEach(elem=>{
+    elem.style.display="block";
+  });
+  document.querySelectorAll(".menu").forEach(elem=>{
+    elem.style.display="None";
+  });
+  socket.emit("start",data);
+  
+});

@@ -14,7 +14,40 @@ let num=[0];
 const exampleRoom={
   name:"",
   creatorId:"",
+};
+const exampleGame={
+  id:"exampleId",
+  pl1:"",
+  pl2:"",
+
+};
+const games={
+  exampleId:exampleGame
+};
+
+const theString="abcdefghijklmnopqrstuvwxyx0123456789abcdefghijklmnopqrstuvwxyz";
+function randomId(len){
+  const a=[];
+  const s=theString;
+  for(let i=0;i<len;i+=1){
+    a.push(s[Math.floor(Math.random()*s.length)]);
+  }
+  return a.join("");
 }
+function clear(id){
+  let n=0;
+  for(let i=0;i<num[0];i+=1){
+    if(rooms[i]["creatorId"]==id){
+      n+=1;
+      continue;
+    }
+    rooms[i-n]=rooms[i];
+    
+  }
+  num[0]-=n;
+  rooms.splice(num[0]);
+  io.emit("catchI",rooms,num[0]);
+};
 
 io.on("connection", (socket) => {
   
@@ -38,35 +71,23 @@ io.on("connection", (socket) => {
     rooms.push(room);
     io.emit("catchI", rooms,num[0]);
   });
-  socket.on("clear",(data)=>{
-    let n=0;
-    for(let i=0;i<num[0];i+=1){
-      if(rooms[i]["creatorId"]==socket.id){
-        n+=1;
-        continue;
-      }
-      rooms[i-n]=rooms[i];
-      
-    }
-    num[0]-=n;
-    rooms.splice(num[0]);
-    io.emit("catchI",rooms,num[0]);
-  });
-  socket.on("disconnect", () => {
-    let n=0;
-    for(let i=0;i<num[0];i+=1){
-      if(rooms[i]["creatorId"]==socket.id){
-        n+=1;
-        continue;
-      }
-      rooms[i-n]=rooms[i];
-      
-    }
-    num[0]-=n;
-    rooms.splice(num[0]);
-    io.emit("catchI",rooms,num[0]);
-  });
+  socket.on("clear",(data)=>clear(socket.id));
+  socket.on("disconnect", () => clear(socket.id));
+  socket.on("match",(data)=>{
+    clear(socket.id);
+    clear(data["creatorId"]);
+    let gameId=randomId(9);
+    const game={
+      id:gameId,
+      pl1:data["creatorId"],
+      pl2:socket.id,
+    };
+    socket.join(gameId);
+    io.sockets.sockets.get(data["creatorId"]).join(gameId);
+    games[gameId]=game;
+    io.to(gameId).emit("gameStart",[data["creatorId"],socket.id]);
 
+  });
   //下面這坨欠改
   socket.on("move", (data) => {
     socket.broadcast.emit("move", data);

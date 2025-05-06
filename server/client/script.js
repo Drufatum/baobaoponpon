@@ -152,12 +152,11 @@ function meow(e){
   draw();
 }
 function choose(e){
-  
   let z=[e.clientX - rect.left,e.clientY - rect.top];
   for(let i=0;i<2;i+=1){
+    
     if(complexAbs(complexMinus(z,[bowpow[i].x,bowpow[i].y]))<bowpow[i].radius){
       nowChimeilaId=i;
-      
       document.addEventListener("mouseup", meow);
       return;
     }
@@ -195,7 +194,7 @@ socket.on("私人訊息", (data) => {
   pl[0]=data;
   if(data==1){
     socket.emit("start",0);
-    alert("p");
+    
   }
   
   draw();
@@ -203,7 +202,14 @@ socket.on("私人訊息", (data) => {
 });
 
 socket.on("start", (data) => {
-  
+  if(myId[0]==data[0]){
+    pl[0]=0;
+    
+  }
+  else{
+    
+    pl[0]=1;
+  }
   
   draw();
   
@@ -220,4 +226,3 @@ socket.on("move", (data) => {
   draw();
   
 });
-socket.emit("ok", 0);
