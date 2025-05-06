@@ -152,6 +152,7 @@ function meow(e){
   draw();
 }
 function choose(e){
+  
   let z=[e.clientX - rect.left,e.clientY - rect.top];
   for(let i=0;i<2;i+=1){
     if(complexAbs(complexMinus(z,[bowpow[i].x,bowpow[i].y]))<bowpow[i].radius){
