@@ -100,8 +100,9 @@ io.on("connection", (socket) => {
         else{
           data["now"]="pl0";
         }
-        io.to(gameId).emit("play", data);
         roundCheck=0;
+        io.to(gameId).emit("play", data);
+        
       }
       
     });
@@ -116,8 +117,9 @@ io.on("connection", (socket) => {
         else{
           data["now"]="pl0";
         }
-        io.to(gameId).emit("play", data);
         roundCheck=0;
+        io.to(gameId).emit("play", data);
+        
       }
     });
     let readyCheck=0;

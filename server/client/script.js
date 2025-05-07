@@ -2,7 +2,6 @@ const socket = io(
     location.hostname === "localhost"
       ? "http://localhost:3000"
       : "https://baobaoponpon-2.onrender.com"
-      : "https://baobaoponpon-2.onrender.com"
 );
 // 取得畫布與繪圖上下文
 const canvas = document.getElementById("myCanvas");
@@ -37,7 +36,24 @@ let tobyChimeila={
   name:"",
   teams:"pl0",
   x:90,
-  y:canvas.height*0.5,
+  y:canvas.height*0.33,
+  vx:0,
+  vy:0,
+  m:100,
+  fk:0.02,
+  radius:30,
+  c:"red",
+  hp:80,
+  atk:15,
+  specialAbility:{},
+  buff:{},
+  debuff:{}
+}
+let tobbyChimeila={
+  name:"",
+  teams:"pl0",
+  x:90,
+  y:canvas.height*0.66,
   vx:0,
   vy:0,
   m:100,
@@ -54,7 +70,24 @@ let emsChimeila={
   name:"",
   teams:"pl1",
   x:canvas.width-90,
-  y:canvas.height*0.5,
+  y:canvas.height*0.33,
+  vx:0,
+  vy:0,
+  m:100,
+  fk:0.02,
+  radius:30,
+  c:"blue",
+  hp:80,
+  atk:15,
+  specialAbility:{},
+  buff:{},
+  debuff:{}
+}
+let emmsChimeila={
+  name:"",
+  teams:"pl1",
+  x:canvas.width-90,
+  y:canvas.height*0.66,
   vx:0,
   vy:0,
   m:100,
@@ -71,13 +104,13 @@ let toby={
   name:"toby",
   id:"",
   teams:"pl0",
-  chimeilas:[tobyChimeila]
+  chimeilas:[tobyChimeila,tobbyChimeila]
 }
 let ems={
   name:"ems",
   id:"",
   teams:"pl1",
-  chimeilas:[emsChimeila]
+  chimeilas:[emsChimeila,emmsChimeila]
 }
 let gameData={
   id:"",
@@ -161,6 +194,7 @@ function g(chimeila){
     chimeila.vx=chimeila.vx-chimeila.vx*chimeila.fk/v;
     chimeila.vy=chimeila.vy-chimeila.vy*chimeila.fk/v;
   }
+  //bowpow純歷史遺毒
   let bowpow=gameData[self]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
     if(bowpow[i]===chimeila){
@@ -189,6 +223,7 @@ function g(chimeila){
       
     }
   }
+  //bowpow純歷史遺毒
   bowpow=gameData[opponent]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
     if(bowpow[i]===chimeila){
@@ -203,6 +238,12 @@ function g(chimeila){
       let tmp1=complexMinus(complexAdd(d,complexMinus([chimeila.vx,chimeila.vy],re1)),complexMinus([bowpow[i].vx,bowpow[i].vy],re0));
       if(complexAbs(tmp)>complexAbs(tmp1)){
         continue;
+      }
+      if(bowpow[i].teams==gameData["now"]){
+        chimeila["hp"]-=bowpow[i]["atk"];
+      }
+      else{
+        bowpow[i]["hp"]-=chimeila["atk"];
       }
       let bowAns=complexAdd(complexAdd(re0,[bowpow[i].vx,bowpow[i].vy]),complexMinus([chimeila.vx,chimeila.vy],re1));
       
@@ -300,6 +341,9 @@ function meow(e){
   document.removeEventListener("mouseup", meow);
 }
 function draw() {
+  //暫時看一下而已，之後再研究怎麼貼到海豹上
+  document.getElementById("hp").textContent=`hp are ${gameData[self]["chimeilas"][0]["hp"]} , ${gameData[self]["chimeilas"][1]["hp"]}`;
+  document.getElementById("atk").textContent=`atk is ${gameData[self]["chimeilas"][0]["atk"]}`;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   for(let i=0;i<gameData[self]["chimeilas"].length;i+=1){
