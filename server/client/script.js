@@ -2,6 +2,7 @@ const socket = io(
     location.hostname === "localhost"
       ? "http://localhost:3000"
       : "https://baobaoponpon-2.onrender.com"
+      : "https://baobaoponpon-2.onrender.com"
 );
 // 取得畫布與繪圖上下文
 const canvas = document.getElementById("myCanvas");
