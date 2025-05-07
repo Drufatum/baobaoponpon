@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static("client"));
 let rooms=[];
-let num=[0];
 const exampleRoom={
   name:"",
   creatorId:"",
@@ -36,7 +35,8 @@ function randomId(len){
 }
 function clear(id){
   let n=0;
-  for(let i=0;i<num[0];i+=1){
+  let num=rooms.length;
+  for(let i=0;i<num;i+=1){
     if(rooms[i]["creatorId"]==id){
       n+=1;
       continue;
@@ -44,9 +44,8 @@ function clear(id){
     rooms[i-n]=rooms[i];
     
   }
-  num[0]-=n;
-  rooms.splice(num[0]);
-  io.emit("catchI",rooms,num[0]);
+  rooms.splice(num-n);
+  io.emit("catchI",rooms);
 };
 
 io.on("connection", (socket) => {
@@ -54,22 +53,20 @@ io.on("connection", (socket) => {
   console.log("有玩家連線");
   
   io.to(socket.id).emit("yourId",socket.id);
-  io.to(socket.id).emit("catchI", rooms,num[0]);
+  io.to(socket.id).emit("catchI", rooms);
   
   
-  socket.on("catchI",(data,n)=>{
+  socket.on("catchI",(data)=>{
     rooms=data;
-    num[0]=n;
-    io.emit("catchI",data,num[0]);
+    io.emit("catchI",data);
   });
   socket.on("createRoom",(data)=>{
     const room={
       name:data,
       creatorId:socket.id,
     }
-    num[0]+=1;
     rooms.push(room);
-    io.emit("catchI", rooms,num[0]);
+    io.emit("catchI", rooms);
   });
   socket.on("clear",(data)=>clear(socket.id));
   socket.on("disconnect", () => clear(socket.id));
@@ -77,31 +74,76 @@ io.on("connection", (socket) => {
     clear(socket.id);
     clear(data["creatorId"]);
     let gameId=randomId(9);
-    const game={
+    let game={
       id:gameId,
       pl1:data["creatorId"],
       pl2:socket.id,
     };
+    let another=io.sockets.sockets.get(data["creatorId"]);
     socket.join(gameId);
-    io.sockets.sockets.get(data["creatorId"]).join(gameId);
+    another.join(gameId);
+    socket.on("move", (data) => {
+      io.to(gameId).emit("move", data);
+    });
+    another.on("move", (data) => {
+      io.to(gameId).emit("move", data);
+    });
+    let roundCheck=0;
+    socket.on("roundEnd", (data) => {
+      if(roundCheck==0){
+        roundCheck=1;
+      }
+      else{
+        if(data["now"]=="pl0"){
+          data["now"]="pl1";
+        }
+        else{
+          data["now"]="pl0";
+        }
+        io.to(gameId).emit("play", data);
+        roundCheck=0;
+      }
+      
+    });
+    another.on("roundEnd", (data) => {
+      if(roundCheck==0){
+        roundCheck=1;
+      }
+      else{
+        if(data["now"]=="pl0"){
+          data["now"]="pl1";
+        }
+        else{
+          data["now"]="pl0";
+        }
+        io.to(gameId).emit("play", data);
+        roundCheck=0;
+      }
+    });
+    let readyCheck=0;
+    socket.on("ready", (data) => {
+      if(readyCheck==0){
+        readyCheck=1;
+      }
+      else{
+        io.to(gameId).emit("move", data);
+        readyCheck=0;
+      }
+      
+    });
+    another.on("ready", (data) => {
+      if(readyCheck==0){
+        readyCheck=1;
+      }
+      else{
+        
+        io.to(gameId).emit("move", data);
+        readyCheck=0;
+      }
+    });
     games[gameId]=game;
     io.to(gameId).emit("gameStart",[data["creatorId"],socket.id]);
-
-  });
-  //下面這坨欠改
-  socket.on("move", (data) => {
-    socket.broadcast.emit("move", data);
-  });
-  socket.on("ok", (data) => {
     
-    player[player["num"]]=socket.id;
-    io.to(player[player["num"]]).emit("私人訊息", player["num"]);
-    if(player["num"]==0){
-      player["num"]+=1;
-    }
-  });
-  socket.on("start",(data)=>{
-    socket.broadcast.emit("start", data);
   });
   
 

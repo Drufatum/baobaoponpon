@@ -1,23 +1,23 @@
-const myId=[""];
+let myId="";
 //catchI是捉i的意思
-function catchI(data,n){
+function catchI(data){
     document.querySelectorAll(".room").forEach(elem=>{
         document.getElementById("room").removeChild(elem);
     });
-    for(let i=0;i<n;i+=1){
-        if(data[i]["creatorId"]==myId[0]){
+    for(let i=0;i<data.length;i+=1){
+        if(data[i]["creatorId"]==myId){
             const cancel=document.createElement("button");
             document.getElementById("room").appendChild(cancel);
             cancel.textContent="cancel";
             cancel.classList.add("room");
             cancel.addEventListener("click",()=>{
-                for(let j=i;j<n-1;j++){
+                for(let j=i;j<data.length-1;j++){
                     for(let k in data[j]){
                         data[j][k]=data[j+1][k];
                     }
                 }
                 data.pop();
-                socket.emit("catchI",data,n-1);
+                socket.emit("catchI",data);
             });
         }
         else{
@@ -30,7 +30,6 @@ function catchI(data,n){
             });
         }
     }
-
 };
 //可莉
 function clear(){
@@ -42,17 +41,55 @@ document.getElementById("createRoom").addEventListener("click",()=>{
 });
 document.getElementById("clear").addEventListener("click",clear);
 socket.on("yourId",(data)=>{
-    myId[0]=data;
+    myId=data;
 });
 socket.on("catchI",catchI);
 socket.on("gameStart",(data)=>{
-
+  if(data[0]==myId){
+    self="pl1";
+    opponent="pl0";
+  }
   document.querySelectorAll(".game").forEach(elem=>{
     elem.style.display="block";
   });
   document.querySelectorAll(".menu").forEach(elem=>{
     elem.style.display="None";
   });
-  socket.emit("start",data);
-  
+  socket.emit("ready",gameData);
 });
+/*
+目前缺匹配成功到對局中間的轉場，預期效果如下(總經原還在追我!?)
+以上面那個socket.on開始，data內為[creatorId,playerId](可以自己去server.js改掉，這我測試用的而已)
+選海豹、決定先後手，伺服器端應判斷兩人是否皆準備完成(我淺判過了)
+伺服器端emit("move",gameData)
+let gameData={
+  id:"",
+  pl0:toby,
+  pl1:ems,
+  nowChimeila:null,
+  now:"pl0"
+}
+const exampleSb={
+  name:"",
+  id:"",
+  teams:0,
+  chimeilas:[],
+}
+const exampleChimeila={
+  name:"",
+  teams:0,
+  x:canvas.width-90,
+  y:canvas.height*0.5,
+  vx:0,
+  vy:0,
+  m:100,
+  fk:0.02,
+  radius:30,
+  c:"blue",
+  hp:80,
+  atk:15,
+  specialAbility:{},
+  buff:{},
+  debuff:{}
+}
+*/
