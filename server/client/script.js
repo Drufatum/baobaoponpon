@@ -1,7 +1,7 @@
 const socket = io(
     location.hostname === "localhost"
       ? "http://localhost:3000"
-      : "https://bow-8ssn.onrender.com"
+      : "https://baobaoponpon-1.onrender.com"
 );
 // 取得畫布與繪圖上下文
 const canvas = document.getElementById("myCanvas");
