@@ -50,6 +50,14 @@ socket.on("gameStart",(data)=>{
     self="pl1";
     opponent="pl0";
   }
+  if(data[0]!=myId){
+    document.body.style.backgroundColor="rgba(248, 145, 145, 0.85)";
+    
+  }
+  else{
+    document.body.style.backgroundColor="rgba(154, 212, 249, 0.85)";
+    
+  }
   document.querySelectorAll(".select").forEach(elem=>{
     elem.style.display="block";
   });
@@ -62,12 +70,14 @@ socket.on("gameStart",(data)=>{
   submit.id="submit";
   submit.addEventListener("click",()=>{
     socket.emit("ready",gameData);
+    
     document.querySelectorAll(".game").forEach(elem=>{
         elem.style.display="block";
     });
     document.querySelectorAll(".select").forEach(elem=>{
         elem.style.display="None";
     });
+    
   })
   submit.style.display="None";
   allChimeilas.forEach(elem=>{

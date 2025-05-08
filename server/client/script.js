@@ -7,6 +7,10 @@ const socket = io(
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const epsilon =0.00001;
+
+const img = new Image();
+img.src = './img/bubble.png';
+
 let self="pl0";
 let opponent="pl1";
 const exampleSb={
@@ -174,9 +178,10 @@ function f(chimeila){
   chimeila.x+=chimeila.vx;
   chimeila.y+=chimeila.vy; 
   ctx.beginPath();
-  ctx.arc(chimeila.x, chimeila.y, 0.95*chimeila.radius, 0, Math.PI * 2);
+  ctx.arc(chimeila.x, chimeila.y, chimeila.radius, 0, Math.PI * 2);
   ctx.fillStyle = chimeila.c;
   ctx.fill();
+  ctx.drawImage(img,0,0,707,780,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
   ctx.closePath();
   if(chimeila.vx==0&&chimeila.vy==0){
     return 0;
@@ -286,8 +291,10 @@ function play(){
   document.getElementById("round").textContent="you";
   canvas.addEventListener("mousedown", choose);
   canvas.addEventListener("touchstart", choose);
+  
 }
 function choose(e){
+  e.preventDefault();
   let rect=canvas.getBoundingClientRect();
   let z=[e.clientX - rect.left,e.clientY - rect.top];
   
@@ -351,6 +358,13 @@ function draw() {
     requestAnimationFrame(draw);
   }
   else{
+    if(self==gameData["now"]){
+      document.getElementById("round").textContent="opponent";
+      
+    }
+    else{
+      document.getElementById("round").textContent="you";
+    }
     socket.emit("roundEnd",gameData);
   }
 }
