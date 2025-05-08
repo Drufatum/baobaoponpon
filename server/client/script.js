@@ -195,7 +195,8 @@ function g(chimeila){
     chimeila.vy=chimeila.vy-chimeila.vy*chimeila.fk/v;
   }
   //bowpow純歷史遺毒
-  let bowpow=gameData[self]["chimeilas"];
+  //這裡寫"pl0"，而非self，是為了讓雙方以完全相同的順序判斷，否則會出現細微誤差，然後蝴蝶效應崩崩崩
+  let bowpow=gameData["pl0"]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
     if(bowpow[i]===chimeila){
       continue;
@@ -209,6 +210,12 @@ function g(chimeila){
       let tmp1=complexMinus(complexAdd(d,complexMinus([chimeila.vx,chimeila.vy],re1)),complexMinus([bowpow[i].vx,bowpow[i].vy],re0));
       if(complexAbs(tmp)>complexAbs(tmp1)){
         continue;
+      }
+      if(bowpow[i].teams==gameData["now"] && chimeila.teams!=gameData["now"]){
+        chimeila["hp"]-=bowpow[i]["atk"];
+      }
+      else{
+        bowpow[i]["hp"]-=chimeila["atk"];
       }
       let bowAns=complexAdd(complexAdd(re0,[bowpow[i].vx,bowpow[i].vy]),complexMinus([chimeila.vx,chimeila.vy],re1));
       
@@ -224,7 +231,8 @@ function g(chimeila){
     }
   }
   //bowpow純歷史遺毒
-  bowpow=gameData[opponent]["chimeilas"];
+
+  bowpow=gameData["pl1"]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
     if(bowpow[i]===chimeila){
       continue;
@@ -239,7 +247,7 @@ function g(chimeila){
       if(complexAbs(tmp)>complexAbs(tmp1)){
         continue;
       }
-      if(bowpow[i].teams==gameData["now"]){
+      if(bowpow[i].teams==gameData["now"] && chimeila.teams!=gameData["now"]){
         chimeila["hp"]-=bowpow[i]["atk"];
       }
       else{
