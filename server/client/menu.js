@@ -112,6 +112,12 @@ socket.on("gameStart",(data)=>{
   
   
 });
+const rickRoll=document.getElementById("it's a secret");
+rickRoll.addEventListener("click",()=>{
+    window.location.href = "https://youtu.be/ALiLGgn3YGM?si=5uvtB98-tdwFNkA7";
+})
+
+
 /*
 目前缺匹配成功到對局中間的轉場，預期效果如下(總經原還在追我!?)
 以上面那個socket.on開始，data內為[creatorId,playerId](可以自己去server.js改掉，這我測試用的而已)
