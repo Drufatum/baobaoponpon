@@ -24,7 +24,7 @@ const games={
   exampleId:exampleGame
 };
 
-const theString="abcdefghijklmnopqrstuvwxyx0123456789abcdefghijklmnopqrstuvwxyz";
+const theString="abcdefghijklmnopqrstuvwxyx0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function randomId(len){
   const a=[];
   const s=theString;

@@ -32,7 +32,7 @@ const exampleChimeila={
   buff:{},
   debuff:{}
 }
-let tobyChimeila={
+let tmp00={
   name:"",
   teams:"pl0",
   x:90,
@@ -49,7 +49,7 @@ let tobyChimeila={
   buff:{},
   debuff:{}
 }
-let tobbyChimeila={
+let tmp01={
   name:"",
   teams:"pl0",
   x:90,
@@ -66,7 +66,7 @@ let tobbyChimeila={
   buff:{},
   debuff:{}
 }
-let emsChimeila={
+let tmp10={
   name:"",
   teams:"pl1",
   x:canvas.width-90,
@@ -83,7 +83,7 @@ let emsChimeila={
   buff:{},
   debuff:{}
 }
-let emmsChimeila={
+let tmp11={
   name:"",
   teams:"pl1",
   x:canvas.width-90,
@@ -104,13 +104,13 @@ let toby={
   name:"toby",
   id:"",
   teams:"pl0",
-  chimeilas:[tobyChimeila,tobbyChimeila]
+  chimeilas:[tmp00,tmp01]
 }
 let ems={
   name:"ems",
   id:"",
   teams:"pl1",
-  chimeilas:[emsChimeila,emmsChimeila]
+  chimeilas:[tmp10,tmp11]
 }
 let gameData={
   id:"",
@@ -260,32 +260,6 @@ function g(chimeila){
   }
     
 }
-//泡泡!我的泡泡!
-//我真會寫註解(得意
-const powpow={
-  x:canvas.width-90,
-  y:canvas.height*0.5,
-  vx:0,
-  vy:0,
-  fk:0.02,
-  radius:30,
-  c:"blue",
-  hp:80,
-  atk:15,
-  team:1
-};
-const bowbow={
-  x:90,
-  y:canvas.height*0.5,
-  vx:0,
-  vy:0,
-  fk:0.02,
-  radius:30,
-  c:"red",
-  hp:80,
-  atk:15,
-  team:0
-};
 
 socket.on("move", (data)=>{
   gameData=data;
