@@ -45,17 +45,62 @@ socket.on("yourId",(data)=>{
 });
 socket.on("catchI",catchI);
 socket.on("gameStart",(data)=>{
+
   if(data[0]==myId){
     self="pl1";
     opponent="pl0";
   }
-  document.querySelectorAll(".game").forEach(elem=>{
+  document.querySelectorAll(".select").forEach(elem=>{
     elem.style.display="block";
   });
   document.querySelectorAll(".menu").forEach(elem=>{
     elem.style.display="None";
   });
-  socket.emit("ready",gameData);
+  const final=new Set();
+  let submit=document.createElement("button");
+  submit.textContent="sure";
+  submit.id="submit";
+  submit.addEventListener("click",()=>{
+    socket.emit("ready",gameData);
+    document.querySelectorAll(".game").forEach(elem=>{
+        elem.style.display="block";
+    });
+    document.querySelectorAll(".select").forEach(elem=>{
+        elem.style.display="None";
+    });
+  })
+  submit.style.display="None";
+  allChimeilas.forEach(elem=>{
+    const button=document.createElement("button");
+    button.textContent=elem["name"];
+    
+    button.addEventListener("click",()=>{
+        if(final.has(elem)){
+            final.delete(elem);
+            button.style.color="black";
+            submit.style.display="None";
+            document.getElementById(select).removeChild(document.getElementById("submit"));
+        }
+        else{
+            if(final.size<3){
+                final.add(elem);
+                button.style.color="red";
+                if(final.size==3){
+                    submit.style.display="block";
+                    
+
+                }
+            }
+        }
+    });
+    document.getElementById("select").appendChild(button);
+  
+  })
+  document.getElementById("select").appendChild(submit);
+  
+  
+  
+  
 });
 /*
 目前缺匹配成功到對局中間的轉場，預期效果如下(總經原還在追我!?)

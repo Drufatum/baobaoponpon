@@ -280,9 +280,12 @@ socket.on("play", (data)=>{
 function play(){
   
   if(self!=gameData["now"]){
+    document.getElementById("round").textContent="opponent";
     return;
   }
+  document.getElementById("round").textContent="you";
   canvas.addEventListener("mousedown", choose);
+  canvas.addEventListener("touchstart", choose);
 }
 function choose(e){
   let rect=canvas.getBoundingClientRect();
@@ -296,6 +299,7 @@ function choose(e){
       gameData["nowChimeila"]=chi[i];
 
       document.addEventListener("mouseup", meow);
+      document.addEventListener("touchend", meow);
       return;
     }
   }
@@ -319,8 +323,10 @@ function meow(e){
   
 
   socket.emit("move", gameData);
-  canvas.removeEventListener("mousedown", choose);
+  canvas.removeEventListener("touchstart", choose);
   document.removeEventListener("mouseup", meow);
+  canvas.removeEventListener("mousedown", choose);
+  document.removeEventListener("touchend", meow);
 }
 function draw() {
   //暫時看一下而已，之後再研究怎麼貼到海豹上
@@ -328,18 +334,18 @@ function draw() {
   document.getElementById("atk").textContent=`atk is ${gameData[self]["chimeilas"][0]["atk"]}`;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  for(let i=0;i<gameData[self]["chimeilas"].length;i+=1){
-    g(gameData[self]["chimeilas"][i]);
+  for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    g(gameData["pl0"]["chimeilas"][i]);
   }
-  for(let i=0;i<gameData[opponent]["chimeilas"].length;i+=1){
-    g(gameData[opponent]["chimeilas"][i]);
+  for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
+    g(gameData["pl1"]["chimeilas"][i]);
   }
   let bo=0;
-  for(let i=0;i<gameData[self]["chimeilas"].length;i+=1){
-    bo+=f(gameData[self]["chimeilas"][i]);
+  for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    bo+=f(gameData["pl0"]["chimeilas"][i]);
   }
-  for(let i=0;i<gameData[opponent]["chimeilas"].length;i+=1){
-    bo+=f(gameData[opponent]["chimeilas"][i]);
+  for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
+    bo+=f(gameData["pl1"]["chimeilas"][i]);
   }
   if(bo!=0){
     requestAnimationFrame(draw);
