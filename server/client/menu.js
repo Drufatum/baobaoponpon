@@ -46,15 +46,15 @@ socket.on("yourId",(data)=>{
 socket.on("catchI",catchI);
 socket.on("gameStart",(data)=>{
 
-  if(data[0]==myId){
+  if(data["pl1"]["id"]==myId){
     self="pl1";
     opponent="pl0";
-  }
-  if(data[0]!=myId){
     document.body.style.backgroundColor="rgba(248, 145, 145, 0.85)";
     
   }
   else{
+    self="pl0";
+    opponent="pl1";
     document.body.style.backgroundColor="rgba(154, 212, 249, 0.85)";
     
   }
@@ -69,7 +69,22 @@ socket.on("gameStart",(data)=>{
   submit.textContent="sure";
   submit.id="submit";
   submit.addEventListener("click",()=>{
-    socket.emit("ready",gameData);
+    let chimeilas=Array.from(final);
+    let ans=[];
+    let t=0;
+    chimeilas.forEach(elem=>{
+      t+=1;
+      let tmp={};
+      for(i in elem){
+        tmp[i]=elem[i];
+      }
+      tmp["teams"]=self;
+      tmp["numberInTeams"]=t;
+      startPosition(tmp);
+      ans.push(tmp);
+      
+    })
+    data[self]["chimeilas"]=ans;
     
     document.querySelectorAll(".game").forEach(elem=>{
         elem.style.display="block";
@@ -78,11 +93,15 @@ socket.on("gameStart",(data)=>{
         elem.style.display="None";
     });
     
+    socket.emit("ready",data[self]);
   })
   submit.style.display="None";
+  
   allChimeilas.forEach(elem=>{
+    
     const button=document.createElement("button");
     button.textContent=elem["name"];
+    
     
     button.addEventListener("click",()=>{
         if(final.has(elem)){
@@ -103,8 +122,9 @@ socket.on("gameStart",(data)=>{
             }
         }
     });
+    button.style.display="block";
     document.getElementById("select").appendChild(button);
-  
+    
   })
   document.getElementById("select").appendChild(submit);
   

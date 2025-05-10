@@ -74,11 +74,33 @@ io.on("connection", (socket) => {
     clear(socket.id);
     clear(data["creatorId"]);
     let gameId=randomId(9);
+    let trueRedTrueBlue=Math.floor(Math.random()*2);
     let game={
       id:gameId,
-      pl1:data["creatorId"],
-      pl2:socket.id,
+      pl0:{
+        id:"",
+        name:"",
+        teams:"pl0",
+        chimeilas:[]
+      },
+      pl1:{
+        id:"",
+        name:"",
+        teams:"pl1",
+        chimeilas:[]
+      },
+      nowChimeila:null,
+      now:"pl0"
     };
+    games[gameId]=game;
+    if(trueRedTrueBlue==0){
+      game["pl0"]["id"]=data["creatorId"];
+      game["pl1"]["id"]=socket.id;
+    }
+    else{
+      game["pl1"]["id"]=data["creatorId"];
+      game["pl0"]["id"]=socket.id;
+    }
     let another=io.sockets.sockets.get(data["creatorId"]);
     socket.join(gameId);
     another.join(gameId);
@@ -124,27 +146,29 @@ io.on("connection", (socket) => {
     });
     let readyCheck=0;
     socket.on("ready", (data) => {
+      game[data["teams"]]=data;
       if(readyCheck==0){
         readyCheck=1;
       }
       else{
-        io.to(gameId).emit("move", data);
+        io.to(gameId).emit("move", game);
         readyCheck=0;
       }
       
     });
     another.on("ready", (data) => {
-      if(readyCheck==0){
+      game[data["teams"]]=data;
+      if(readyCheck==0){      
         readyCheck=1;
       }
       else{
         
-        io.to(gameId).emit("move", data);
+        io.to(gameId).emit("move", game);
         readyCheck=0;
       }
     });
-    games[gameId]=game;
-    io.to(gameId).emit("gameStart",[data["creatorId"],socket.id]);
+    
+    io.to(gameId).emit("gameStart",game);
     
   });
   

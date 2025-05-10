@@ -8,118 +8,15 @@ const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const epsilon =0.00001;
 
-const img = new Image();
-img.src = './img/bubble.png';
+let myName="";
 
-let self="pl0";
-let opponent="pl1";
-const exampleSb={
-  name:"",
-  id:"",
-  teams:0,
-  chimeilas:[],
-}
-const exampleChimeila={
-  name:"",
-  teams:0,
-  x:canvas.width-90,
-  y:canvas.height*0.5,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"blue",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-let tmp00={
-  name:"",
-  teams:"pl0",
-  x:90,
-  y:canvas.height*0.33,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"red",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-let tmp01={
-  name:"",
-  teams:"pl0",
-  x:90,
-  y:canvas.height*0.66,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"red",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-let tmp10={
-  name:"",
-  teams:"pl1",
-  x:canvas.width-90,
-  y:canvas.height*0.33,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"blue",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-let tmp11={
-  name:"",
-  teams:"pl1",
-  x:canvas.width-90,
-  y:canvas.height*0.66,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"blue",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-let toby={
-  name:"toby",
-  id:"",
-  teams:"pl0",
-  chimeilas:[tmp00,tmp01]
-}
-let ems={
-  name:"ems",
-  id:"",
-  teams:"pl1",
-  chimeilas:[tmp10,tmp11]
-}
+let self="";
+let opponent="";
+
 let gameData={
   id:"",
-  pl0:toby,
-  pl1:ems,
+  pl0:{},
+  pl1:{},
   nowChimeila:null,
   now:"pl0"
 
@@ -179,9 +76,12 @@ function f(chimeila){
   chimeila.y+=chimeila.vy; 
   ctx.beginPath();
   ctx.arc(chimeila.x, chimeila.y, chimeila.radius, 0, Math.PI * 2);
-  ctx.fillStyle = chimeila.c;
+  ctx.fillStyle = chimeila.teams=="pl0"?"blue":"red";
   ctx.fill();
-  ctx.drawImage(img,0,0,707,780,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
+  
+  const img = new Image();
+  img.src=chimeila.img;
+  ctx.drawImage(img,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
   ctx.closePath();
   if(chimeila.vx==0&&chimeila.vy==0){
     return 0;
@@ -316,7 +216,7 @@ function choose(e){
 function meow(e){
   
   let rect=canvas.getBoundingClientRect();
-  let z=[e.clientX - rect.left,e.clientY - rect.top];
+  let z=[(e.clientX || e.changedTouches.clientX) - rect.left,(e.clientY || e.changedTouches.clientY) - rect.top] ;
   
   gameData["nowChimeila"].vx=(gameData["nowChimeila"].x-z[0])/30;
   gameData["nowChimeila"].vy=(gameData["nowChimeila"].y-z[1])/30;
@@ -335,6 +235,7 @@ function meow(e){
   canvas.removeEventListener("mousedown", choose);
   document.removeEventListener("touchend", meow);
 }
+let first=10;
 function draw() {
   //暫時看一下而已，之後再研究怎麼貼到海豹上
   document.getElementById("hp").textContent=`hp are ${gameData[self]["chimeilas"][0]["hp"]} , ${gameData[self]["chimeilas"][1]["hp"]}`;
@@ -354,17 +255,14 @@ function draw() {
   for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
     bo+=f(gameData["pl1"]["chimeilas"][i]);
   }
-  if(bo!=0){
+  if(bo!=0||first!=0){
     requestAnimationFrame(draw);
+    if(first>0)first-=1;
   }
   else{
-    if(self==gameData["now"]){
-      document.getElementById("round").textContent="opponent";
+    document.getElementById("round").textContent="opponent";
       
-    }
-    else{
-      document.getElementById("round").textContent="you";
-    }
+    
     socket.emit("roundEnd",gameData);
   }
 }
