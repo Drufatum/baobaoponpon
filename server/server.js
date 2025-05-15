@@ -116,12 +116,6 @@ io.on("connection", (socket) => {
         roundCheck=1;
       }
       else{
-        if(data["now"]=="pl0"){
-          data["now"]="pl1";
-        }
-        else{
-          data["now"]="pl0";
-        }
         roundCheck=0;
         io.to(gameId).emit("play", data);
         
@@ -133,12 +127,6 @@ io.on("connection", (socket) => {
         roundCheck=1;
       }
       else{
-        if(data["now"]=="pl0"){
-          data["now"]="pl1";
-        }
-        else{
-          data["now"]="pl0";
-        }
         roundCheck=0;
         io.to(gameId).emit("play", data);
         
@@ -146,6 +134,7 @@ io.on("connection", (socket) => {
     });
     let readyCheck=0;
     socket.on("ready", (data) => {
+      console.log("wow");
       game[data["teams"]]=data;
       if(readyCheck==0){
         readyCheck=1;
@@ -157,7 +146,9 @@ io.on("connection", (socket) => {
       
     });
     another.on("ready", (data) => {
+      console.log("wow");
       game[data["teams"]]=data;
+      
       if(readyCheck==0){      
         readyCheck=1;
       }
@@ -167,7 +158,6 @@ io.on("connection", (socket) => {
         readyCheck=0;
       }
     });
-    
     io.to(gameId).emit("gameStart",game);
     
   });

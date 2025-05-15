@@ -12,15 +12,9 @@ let myName="";
 
 let self="";
 let opponent="";
+let injuryTime=false;
 
-let gameData={
-  id:"",
-  pl0:{},
-  pl1:{},
-  nowChimeila:null,
-  now:"pl0"
 
-};
 
 function complexAbs(z){
   return Math.sqrt(z[0]*z[0]+z[1]*z[1]);
@@ -56,20 +50,28 @@ function reflect(z1,z2){
 }
 //畫出sea-bao並更新座標(為防止一些神秘的bug，撞牆反彈是在這判斷)
 function f(chimeila){
+  if(chimeila.death===true){
+    return 0;
+  }
+  chimeila.birth=false;
   if(chimeila.x-chimeila.radius<=0){
-    chimeila.x=chimeila.radius+epsilon;
+    
+    chimeila.birth=true;
     if(chimeila.vx<0) chimeila.vx=-chimeila.vx;
   }
   if(chimeila.x+chimeila.radius>=canvas.width){
-    chimeila.x=canvas.width-chimeila.radius-epsilon;
+    
+    chimeila.birth=true;
     if(chimeila.vx>0) chimeila.vx=-chimeila.vx;
   }
   if(chimeila.y-chimeila.radius<=0){
-    chimeila.y=chimeila.radius+epsilon;
+    
+    chimeila.birth=true;
     if(chimeila.vy<0) chimeila.vy=-chimeila.vy;
   }
   if(chimeila.y+chimeila.radius>=canvas.height){
-    chimeila.y=canvas.height-chimeila.radius-epsilon;
+    
+    chimeila.birth=true;
     if(chimeila.vy>0) chimeila.vy=-chimeila.vy;
   }
   chimeila.x+=chimeila.vx;
@@ -83,13 +85,23 @@ function f(chimeila){
   img.src=chimeila.img;
   ctx.drawImage(img,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
   ctx.closePath();
+  ctx.font = "20px Arial";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "black";
+
+  ctx.fillText(`${chimeila.hp}`, chimeila.x-chimeila.radius/2, chimeila.y+chimeila.radius+20);
+  ctx.fillText(`${chimeila.atk}`, chimeila.x+chimeila.radius/2, chimeila.y+chimeila.radius+20);
   if(chimeila.vx==0&&chimeila.vy==0){
+    
     return 0;
   }
   return 1;
 }
 //更新速度(為防止一些神秘的bug，撞牆反彈是在f判斷)
 function g(chimeila){
+  if(chimeila.death===true){
+    return;
+  }
   let v=complexAbs([chimeila.vx,chimeila.vy]);
   if(chimeila.fk>=v){
     chimeila.vx=0;
@@ -103,6 +115,9 @@ function g(chimeila){
   //這裡寫"pl0"，而非self，是為了讓雙方以完全相同的順序判斷，否則會出現細微誤差，然後蝴蝶效應崩崩崩
   let bowpow=gameData["pl0"]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
+    if(bowpow[i].death===true){
+      continue;
+    }
     if(bowpow[i]===chimeila){
       continue;
     }
@@ -116,29 +131,38 @@ function g(chimeila){
       if(complexAbs(tmp)>complexAbs(tmp1)){
         continue;
       }
-      if(bowpow[i].teams==gameData["now"] && chimeila.teams!=gameData["now"]){
-        chimeila["hp"]-=bowpow[i]["atk"];
-      }
-      else{
-        bowpow[i]["hp"]-=chimeila["atk"];
-      }
+      pon(chimeila,bowpow[i]);
       let bowAns=complexAdd(complexAdd(re0,[bowpow[i].vx,bowpow[i].vy]),complexMinus([chimeila.vx,chimeila.vy],re1));
       
       bowAns=complexDivid(bowAns,[2,0]);
       let chiAns=complexAdd(complexAdd(re1,[chimeila.vx,chimeila.vy]),complexMinus([bowpow[i].vx,bowpow[i].vy],re0));
       chiAns=complexDivid(chiAns,[2,0]);
-      
-      bowpow[i].vx=bowAns[0];
-      bowpow[i].vy=bowAns[1];
-      chimeila.vx=chiAns[0];
-      chimeila.vy=chiAns[1];
-      
+      if(chimeila.birth===true){
+        bowAns[0]*=1.5;
+        bowAns[1]*=1.5;
+      }
+      if(bowpow[i].birth===true){
+        
+        chiAns[0]*=1.5;
+        chiAns[1]*=1.5;
+      }
+      if(bowpow[i].birth!==true){
+        bowpow[i].vx=bowAns[0];
+        bowpow[i].vy=bowAns[1];
+      }
+      if(chimeila.birth!==true){
+        chimeila.vx=chiAns[0];
+        chimeila.vy=chiAns[1];
+      }
     }
   }
   //bowpow純歷史遺毒
 
   bowpow=gameData["pl1"]["chimeilas"];
   for(let i=0;i<bowpow.length;i=i+1){
+    if(bowpow[i].death===true){
+      continue;
+    }
     if(bowpow[i]===chimeila){
       continue;
     }
@@ -152,22 +176,29 @@ function g(chimeila){
       if(complexAbs(tmp)>complexAbs(tmp1)){
         continue;
       }
-      if(bowpow[i].teams==gameData["now"] && chimeila.teams!=gameData["now"]){
-        chimeila["hp"]-=bowpow[i]["atk"];
-      }
-      else{
-        bowpow[i]["hp"]-=chimeila["atk"];
-      }
+      pon(chimeila,bowpow[i]);
       let bowAns=complexAdd(complexAdd(re0,[bowpow[i].vx,bowpow[i].vy]),complexMinus([chimeila.vx,chimeila.vy],re1));
       
       bowAns=complexDivid(bowAns,[2,0]);
       let chiAns=complexAdd(complexAdd(re1,[chimeila.vx,chimeila.vy]),complexMinus([bowpow[i].vx,bowpow[i].vy],re0));
       chiAns=complexDivid(chiAns,[2,0]);
-      
-      bowpow[i].vx=bowAns[0];
-      bowpow[i].vy=bowAns[1];
-      chimeila.vx=chiAns[0];
-      chimeila.vy=chiAns[1];
+      if(chimeila.birth===true){
+        bowAns[0]*=1.5;
+        bowAns[1]*=1.5;
+      }
+      if(bowpow[i].birth===true){
+        
+        chiAns[0]*=1.5;
+        chiAns[1]*=1.5;
+      }
+      if(bowpow[i].birth!==true){
+        bowpow[i].vx=bowAns[0];
+        bowpow[i].vy=bowAns[1];
+      }
+      if(chimeila.birth!==true){
+        chimeila.vx=chiAns[0];
+        chimeila.vy=chiAns[1];
+      }
       
     }
   }
@@ -176,7 +207,7 @@ function g(chimeila){
 
 socket.on("move", (data)=>{
   gameData=data;
-  draw();
+  requestAnimationFrame(draw);
 });
 socket.on("play", (data)=>{
   gameData=data;
@@ -194,14 +225,12 @@ function play(){
   
 }
 function choose(e){
-  e.preventDefault();
   let rect=canvas.getBoundingClientRect();
   let z=[e.clientX - rect.left,e.clientY - rect.top];
-  
   const chi=gameData[self]["chimeilas"];
   for(let i=0;i<chi.length;i+=1){
     
-    if(complexAbs(complexMinus(z,[chi[i].x,chi[i].y]))<chi[i].radius){
+    if(chi[i].death!==true && complexAbs(complexMinus(z,[chi[i].x,chi[i].y]))<chi[i].radius){
       
       gameData["nowChimeila"]=chi[i];
 
@@ -235,14 +264,11 @@ function meow(e){
   canvas.removeEventListener("mousedown", choose);
   document.removeEventListener("touchend", meow);
 }
-let first=10;
 function draw() {
-  //暫時看一下而已，之後再研究怎麼貼到海豹上
-  document.getElementById("hp").textContent=`hp are ${gameData[self]["chimeilas"][0]["hp"]} , ${gameData[self]["chimeilas"][1]["hp"]}`;
-  document.getElementById("atk").textContent=`atk is ${gameData[self]["chimeilas"][0]["atk"]}`;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    
     g(gameData["pl0"]["chimeilas"][i]);
   }
   for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
@@ -255,15 +281,61 @@ function draw() {
   for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
     bo+=f(gameData["pl1"]["chimeilas"][i]);
   }
-  if(bo!=0||first!=0){
+  if(bo!=0){
     requestAnimationFrame(draw);
-    if(first>0)first-=1;
   }
   else{
-    document.getElementById("round").textContent="opponent";
-      
+    injuryTime=false;
+    //復活
+    if(graveyard.length!=0){
+      injuryTime=true;
+      let elem=graveyard.shift();
+      elem.x=elem.teams=="pl0"?-elem.radius:canvas.width+elem.radius;
+      elem.y=canvas.height/2;
+      elem.vx=elem.teams=="pl0"?Math.sqrt(8*commonBao.radius*elem.fk):-Math.sqrt(8*commonBao.radius*elem.fk);
+      elem.birth=true;
+      gameData[elem.teams].chimeilas[elem.numberInTeams]=elem;
+      requestAnimationFrame(draw);
+    }
+    else{
+      gameData.now=(gameData.now=="pl0"?"pl1":"pl0");
     
-    socket.emit("roundEnd",gameData);
+      socket.emit("roundEnd",gameData);
+    }
   }
 }
+function pon(toby,ems){
+  if(injuryTime===true){
+    return;
+  }
+  if(toby.teams==gameData.now){
+    if(ems.teams!=gameData.now){
+      ems.hp-=toby.atk;
+    }
+  }
+  if(toby.teams!=gameData.now){
+    if(ems.teams==gameData.now){
+      toby.hp-=ems.atk;
+    }
+  }
+  if(toby.hp<=0){
+    die(toby);
+  }
+  if(ems.hp<=0){
+    die(ems);
+  }
+}
+function die(chimeila){
+  let ghost={};
+  for(let i in chimeila.relive){
+    ghost[i]=chimeila.relive[i];
+  }
+  ghost["relive"]=chimeila.relive;
+  ghost["teams"]=chimeila["teams"];
+  ghost["numberInTeams"]=chimeila.numberInTeams;
+  chimeila.death=true;
+  graveyard.push(ghost);
+}
 
+//bug:合成，復活卡牆裡
+//不講武德，隨時傷害判定

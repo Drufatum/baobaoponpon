@@ -78,30 +78,29 @@ socket.on("gameStart",(data)=>{
       for(i in elem){
         tmp[i]=elem[i];
       }
+      tmp["relive"]=elem;
       tmp["teams"]=self;
-      tmp["numberInTeams"]=t;
+      tmp["numberInTeams"]=t-1;
       startPosition(tmp);
       ans.push(tmp);
       
     })
     data[self]["chimeilas"]=ans;
-    
     document.querySelectorAll(".game").forEach(elem=>{
         elem.style.display="block";
     });
+
     document.querySelectorAll(".select").forEach(elem=>{
         elem.style.display="None";
     });
-    
     socket.emit("ready",data[self]);
   })
   submit.style.display="None";
   
   allChimeilas.forEach(elem=>{
-    
     const button=document.createElement("button");
     button.textContent=elem["name"];
-    
+
     
     button.addEventListener("click",()=>{
         if(final.has(elem)){
