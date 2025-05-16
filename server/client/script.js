@@ -204,7 +204,25 @@ function g(chimeila){
   }
     
 }
-
+socket.on("initInformation",(data)=>{
+  gameData=data;
+  gameData["pl0"]["chimeilas"].forEach(elem => {
+    let tmp=chimeilaInformation(elem);
+    tmp.style.top=`${elem.numberInTeams*100/3}%`;
+    tmp.style.left="0%";
+    tmp.style.width="100%";
+    document.getElementById("blueChimeilas").appendChild(tmp);
+  });
+  gameData["pl1"]["chimeilas"].forEach(elem => {
+    let tmp=chimeilaInformation(elem);
+    tmp.style.top=`${elem.numberInTeams*100/3}%`;
+    tmp.style.left="0%";
+    tmp.style.width="100%";
+    document.getElementById("redChimeilas").appendChild(tmp);
+  });
+  
+  requestAnimationFrame(draw);
+})
 socket.on("move", (data)=>{
   gameData=data;
   requestAnimationFrame(draw);
@@ -219,7 +237,6 @@ function play(){
     document.getElementById("round").textContent="opponent";
     return;
   }
-  document.getElementById("round").textContent="you";
   canvas.addEventListener("mousedown", choose);
   canvas.addEventListener("touchstart", choose);
   
@@ -290,8 +307,8 @@ function draw() {
     if(graveyard.length!=0){
       injuryTime=true;
       let elem=graveyard.shift();
-      elem.x=elem.teams=="pl0"?-elem.radius:canvas.width+elem.radius;
-      elem.y=canvas.height/2;
+      elem.x=elem.teams=="pl0"?-commonBao.radius:canvas.width+elem.radius;
+      elem.y=canvas.height/gameData[elem.teams].chimeilas.length/2*(1+2*elem.numberInTeams);
       elem.vx=elem.teams=="pl0"?Math.sqrt(8*commonBao.radius*elem.fk):-Math.sqrt(8*commonBao.radius*elem.fk);
       elem.birth=true;
       gameData[elem.teams].chimeilas[elem.numberInTeams]=elem;

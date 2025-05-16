@@ -97,20 +97,45 @@ const flyBao={
 
 
 const exampleMap={
-    width:800,
-    height:600,
+    width:888,
+    height:555,
     numOfChimeila:3
     
 };
 const allChimeilas=[commonBao,bubbleBao,bronyaBao,flyBao];
 function startPosition(chimeila,map=exampleMap){
     if(chimeila["teams"]=="pl0"){
-        chimeila["x"]=90;
-        chimeila["y"]=map["height"]*(chimeila["numberInTeams"]+1)/(map["numOfChimeila"]+1);
+        chimeila["x"]=-commonBao.radius;
+        chimeila["y"]=map["height"]*(2*chimeila["numberInTeams"]+1)/(map["numOfChimeila"]*2);
+        chimeila.vx=Math.sqrt(8*commonBao.radius*chimeila.fk);
+        chimeila.birth=true;
     }
     else{
-        chimeila["x"]=map["width"]-90;
-        chimeila["y"]=map["height"]-map["height"]*(chimeila["numberInTeams"]+1)/(map["numOfChimeila"]+1);
+        chimeila["x"]=map["width"]+commonBao.radius;
+        chimeila["y"]=map["height"]*(2*chimeila["numberInTeams"]+1)/(map["numOfChimeila"]*2);
+        chimeila.vx=-Math.sqrt(8*commonBao.radius*chimeila.fk);
+        chimeila.birth=true;
     }
 }
+function chimeilaInformation(chimeila){
+  let information=document.createElement("div");
+  information.classList.add("chimeila");
+  let img=document.createElement("img");
+  img.src=chimeila.img;
+  img.classList.add("squareChimeila");
+  information.appendChild(img);
+  let tmp=document.createElement("div");
+  tmp.textContent=chimeila.name;
+  tmp.classList.add("name");
+  information.appendChild(tmp);
+  tmp=document.createElement("div");
+  tmp.textContent=`hp:${chimeila.hp}\natk:${chimeila.atk}`;
+  tmp.classList.add("hp");
+  information.appendChild(tmp);
+  return information;
+}
 let graveyard=[];
+
+
+
+//object-fit: cover; （可選 cover、contain、fill） overflow: hidden;

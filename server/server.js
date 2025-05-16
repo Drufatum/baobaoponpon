@@ -140,7 +140,7 @@ io.on("connection", (socket) => {
         readyCheck=1;
       }
       else{
-        io.to(gameId).emit("move", game);
+        io.to(gameId).emit("initInformation", game);
         readyCheck=0;
       }
       
@@ -154,7 +154,7 @@ io.on("connection", (socket) => {
       }
       else{
         
-        io.to(gameId).emit("move", game);
+        io.to(gameId).emit("initInformation", game);
         readyCheck=0;
       }
     });

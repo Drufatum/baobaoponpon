@@ -86,13 +86,17 @@ socket.on("gameStart",(data)=>{
       
     })
     data[self]["chimeilas"]=ans;
-    document.querySelectorAll(".game").forEach(elem=>{
-        elem.style.display="block";
-    });
-
+    
     document.querySelectorAll(".select").forEach(elem=>{
         elem.style.display="None";
     });
+    document.querySelectorAll(".game").forEach(elem=>{
+        elem.style.display="block";
+        let canvas = document.getElementById("myCanvas");
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+    });
+
     socket.emit("ready",data[self]);
   })
   submit.style.display="None";
