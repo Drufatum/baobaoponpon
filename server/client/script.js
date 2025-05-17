@@ -1,7 +1,7 @@
 const socket = io(
     location.hostname === "localhost"
       ? "http://localhost:3000"
-      : "https://baobaoponpon-2.onrender.com"
+      : "https://baobaoponpon-si87.onrender.com"
 );
 // 取得畫布與繪圖上下文
 const canvas = document.getElementById("myCanvas");
@@ -259,11 +259,16 @@ function meow(e){
   
   let rect=canvas.getBoundingClientRect();
   let z=[(e.clientX || e.changedTouches.clientX) - rect.left,(e.clientY || e.changedTouches.clientY) - rect.top] ;
-  
+  let r=complexAbs([(gameData["nowChimeila"].x-z[0])/30,(gameData["nowChimeila"].y-z[1])/30]);
+  if(r<gameData["nowChimeila"].radius/30){
+    document.removeEventListener("mouseup", meow);
+    document.removeEventListener("touchend", meow);
+    return;
+  }
   gameData["nowChimeila"].vx=(gameData["nowChimeila"].x-z[0])/30;
   gameData["nowChimeila"].vy=(gameData["nowChimeila"].y-z[1])/30;
   
-  let r=complexAbs([gameData["nowChimeila"].vx,gameData["nowChimeila"].vy]);
+  
   if(r>100){
     gameData["nowChimeila"].vx=100*gameData["nowChimeila"].vx/r;
     gameData["nowChimeila"].vy=100*gameData["nowChimeila"].vy/r;
@@ -396,3 +401,5 @@ function win(){
 
 //bug:合成，復活卡牆裡
 //不講武德，隨時傷害判定
+
+
