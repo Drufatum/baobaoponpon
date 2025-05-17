@@ -1,8 +1,14 @@
+let myName="";
+
+let self="";
+let opponent="";
+let injuryTime=false;
 let gameData={
   id:"",
   pl0:{},
   pl1:{},
   nowChimeila:null,
+  winner:"",
   now:"pl0"
 };
 const commonBao={
@@ -123,14 +129,23 @@ function chimeilaInformation(chimeila){
   let img=document.createElement("img");
   img.src=chimeila.img;
   img.classList.add("squareChimeila");
+  if(chimeila.teams=="pl0"){
+    img.style.left="40%";
+  }
   information.appendChild(img);
   let tmp=document.createElement("div");
   tmp.textContent=chimeila.name;
+  if(chimeila.teams=="pl0"){
+    tmp.style.left="calc(40% + 1px)";
+  }
   tmp.classList.add("name");
   information.appendChild(tmp);
   tmp=document.createElement("div");
   tmp.textContent=`hp:${chimeila.hp}\natk:${chimeila.atk}`;
   tmp.classList.add("hp");
+  if(chimeila.teams=="pl0"){
+    tmp.style.left="-1px";
+  }
   information.appendChild(tmp);
   return information;
 }
@@ -139,3 +154,24 @@ let graveyard=[];
 
 
 //object-fit: cover; （可選 cover、contain、fill） overflow: hidden;
+
+
+let exampleSb0={
+  name:"toby",
+  id:"",
+  teams:"pl0",
+  chimeilas:[bronyaBao,flyBao,bubbleBao],
+}
+let exampleSb1={
+  name:"ems",
+  id:"",
+  teams:"pl1",
+  chimeilas:[bronyaBao,flyBao,bubbleBao],
+}
+const exampleGame={
+  id:"",
+  pl0:{exampleSb0},
+  pl1:{exampleSb1},
+  nowChimeila:null,
+  now:"pl0"
+}

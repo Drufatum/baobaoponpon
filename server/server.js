@@ -81,15 +81,18 @@ io.on("connection", (socket) => {
         id:"",
         name:"",
         teams:"pl0",
+        score:0,
         chimeilas:[]
       },
       pl1:{
         id:"",
         name:"",
         teams:"pl1",
+        score:0,
         chimeilas:[]
       },
       nowChimeila:null,
+      winner:"",
       now:"pl0"
     };
     games[gameId]=game;
@@ -161,9 +164,14 @@ io.on("connection", (socket) => {
     io.to(gameId).emit("gameStart",game);
     
   });
+  io.on("gameover",(data)=>{
+    games.delete(data.id);
+    socket.leave(data.id);
+  })
   
 
 });
+
 
 
 server.listen(PORT, () => {

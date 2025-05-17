@@ -8,11 +8,7 @@ const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const epsilon =0.00001;
 
-let myName="";
 
-let self="";
-let opponent="";
-let injuryTime=false;
 
 
 
@@ -302,6 +298,11 @@ function draw() {
     requestAnimationFrame(draw);
   }
   else{
+    if(gameData.winner!==""){
+      win();
+      
+      return;
+    }
     injuryTime=false;
     //復活
     if(graveyard.length!=0){
@@ -351,7 +352,46 @@ function die(chimeila){
   ghost["teams"]=chimeila["teams"];
   ghost["numberInTeams"]=chimeila.numberInTeams;
   chimeila.death=true;
+  publish(chimeila.teams);
   graveyard.push(ghost);
+}
+//輸入是死亡吸血鬼的teams
+function publish(pl){
+  let book=document.createElement("img");
+  book.src="./img/book.jpg";
+  book.classList.add("book");
+  
+  if(pl=="pl1"){
+    gameData["pl0"].score+=1;
+    book.style.top=`${20*(5-gameData["pl0"].score)}%`;
+    document.getElementById("leftBookShelf").appendChild(book);
+    if(gameData["pl0"].score==5 && gameData.winner===""){
+      gameData.winner="pl0";
+      injuryTime=true;
+    }
+  }
+  if(pl=="pl0"){
+    gameData["pl1"].score+=1;
+    book.style.top=`${20*(5-gameData["pl1"].score)}%`;
+    document.getElementById("rightBookShelf").appendChild(book);
+    if(gameData["pl1"].score==5 && gameData.winner===""){
+      gameData.winner="pl1";
+      injuryTime=true;
+    }
+  }
+  
+
+}
+function win(){
+  if(gameData.winner==self){
+    alert("win");
+  }
+  else{
+    alert("lose");
+  }
+  document.getElementById("game").style.display="None";
+  document.getElementById("menu").style.display="block";
+  socket.emit("gameover",gameData);
 }
 
 //bug:合成，復活卡牆裡

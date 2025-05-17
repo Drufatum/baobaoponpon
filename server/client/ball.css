@@ -27,6 +27,8 @@ canvas {
   display:None;
 }
 .chimeila{
+  
+    color:#fdfdfd;
       border:solid 1px;
       position: absolute;
       left: 0;
@@ -34,12 +36,14 @@ canvas {
       aspect-ratio: 3 / 2;
       
 }
+
 .squareChimeila{
     
   
     border:solid 0px;
     position: absolute;
     left: 0px;
+    
     
 
     top:0px;
@@ -73,7 +77,52 @@ canvas {
 
     width: calc(40% - 5px);
 }
+#leftHead{
+      border:solid 0px;
+      position: absolute;
+      top:calc(15% - 166.5px);
+      left: calc(50% - 610.5px);
+      height: 166.5px;
+      object-fit: contain;
+      aspect-ratio: 1 / 1;
+}
+#rightHead{
+      border:solid 0px;
+      position: absolute;
+      top:calc(15% - 166.5px);
+      left: calc(50% + 444px);
+      height: 166.5px;
+      object-fit: contain;
+      aspect-ratio: 1 / 1;
+}
+.book{
+  
+  border:solid 1px;
+      position: absolute;
+      left: 0%;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+}
+#leftBookShelf{
+  background-color:  rgba(161, 99, 7, 0.6);
+      border:solid 1px;
+      position: absolute;
+      top:15%;
+      left: calc(50% - 800px);
+      height: 555px;
+      width: 74px;
 
+}
+#rightBookShelf{
+  background-color:  rgba(161, 99, 7, 0.6);
+      border:solid 1px;
+      position: absolute;
+      top:15%;
+      left: calc(50% + 724px);
+      height: 555px;
+      width: 74px;
+
+}
 
 
 
@@ -83,7 +132,7 @@ canvas {
     #myCanvas{
       border:solid 2px;
       position: absolute;
-      top:10%;
+      top:15%;
       left: calc(50% - 446px);
       width: 888px;
       
@@ -91,20 +140,24 @@ canvas {
     }
     
     #redChimeilas{
+      background-color:  rgba(3, 16, 40, 0.6);
       border:solid 2px;
       position: absolute;
-      top:10%;
+      top:15%;
       left: calc(50% + 444px);
       height: 555px;
       aspect-ratio: 1 / 2;
+      
     }
     #blueChimeilas{
+      background-color:  rgba(3, 16, 40, 0.6);
       border:solid 2px;
       position: absolute;
-      top:10%;
+      top:15%;
       left: calc(50% - 725.5px);
       height: 555px;
       aspect-ratio: 1 / 2;
+      
     }
     
 

@@ -49,21 +49,22 @@ socket.on("gameStart",(data)=>{
   if(data["pl1"]["id"]==myId){
     self="pl1";
     opponent="pl0";
-    document.body.style.backgroundColor="rgba(248, 145, 145, 0.85)";
+    document.getElementById("game").style.backgroundColor="rgba(248, 145, 145, 0.85)";
     
   }
   else{
     self="pl0";
     opponent="pl1";
-    document.body.style.backgroundColor="rgba(154, 212, 249, 0.85)";
+    document.getElementById("game").style.backgroundColor="rgba(154, 212, 249, 0.85)";
     
   }
-  document.querySelectorAll(".select").forEach(elem=>{
-    elem.style.display="block";
-  });
   document.querySelectorAll(".menu").forEach(elem=>{
     elem.style.display="None";
   });
+  document.querySelectorAll(".select").forEach(elem=>{
+    elem.style.display="block";
+  });
+  
   const final=new Set();
   let submit=document.createElement("button");
   submit.textContent="sure";
@@ -87,9 +88,10 @@ socket.on("gameStart",(data)=>{
     })
     data[self]["chimeilas"]=ans;
     
-    document.querySelectorAll(".select").forEach(elem=>{
-        elem.style.display="None";
+    document.getElementById("select").childNodes.forEach(elem=>{
+        document.getElementById("select").removeChild(elem);
     });
+    document.getElementById("select").style.display="None";
     document.querySelectorAll(".game").forEach(elem=>{
         elem.style.display="block";
         let canvas = document.getElementById("myCanvas");

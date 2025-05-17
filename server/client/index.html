@@ -7,14 +7,20 @@
   <link rel="stylesheet" href="ball.css" />
 </head>
 <body>
-  <button id="createRoom" class="menu">create room</button>
-  <button id="clear" class="menu">clear</button>
-  <button id="it's a secret" class="menu">don't click me !!!</button>
-  <div id="room" class="menu">room</div>
+  <div id="menu" class="menu">
+    <button id="createRoom" >create room</button>
+    <button id="clear">clear</button>
+    <button id="it's a secret">don't click me !!!</button>
+    <div id="room">room</div>
+  </div>
   <div id="select" class="select">select your chimeila</div>
   
-  <div id="tmp" class="game">
+  <div id="game" class="game">
     <canvas id="myCanvas" width="888" height="555" style="width: 888px; height: 555px;"></canvas>
+    <img id="leftHead" src="./img/FeWomanHead.jpg"></img>
+    <img id="rightHead" src="./img/FeWomanHead.jpg"></img>
+    <div id="leftBookShelf"></div>
+    <div id="rightBookShelf"></div>
     <div id="redChimeilas"></div>
     <div id="blueChimeilas"></div>
   </div>
