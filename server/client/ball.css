@@ -1,9 +1,3 @@
-body {
-    margin: 0;
-    position: relative;
-    height: 100vh;
-    border: solid;
-}
 
 
 canvas {
@@ -16,12 +10,11 @@ canvas {
 }
 .game{
   display:None;
-  border:solid;
+  border:solid 0px;
   position: absolute;
-  top:0%;
-  left: 0%;
-  width: 100%;
-  height:100%;
+  left:calc(50% - 796.5px);
+  width: 1593px;
+  height:1110px;
 }
 .select{
   display:None;

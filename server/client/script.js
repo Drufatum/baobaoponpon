@@ -49,26 +49,26 @@ function f(chimeila){
   if(chimeila.death===true){
     return 0;
   }
-  chimeila.birth=false;
+  let bo=0;
+
   if(chimeila.x-chimeila.radius<=0){
-    
-    chimeila.birth=true;
+    bo=1;
     if(chimeila.vx<0) chimeila.vx=-chimeila.vx;
   }
   if(chimeila.x+chimeila.radius>=canvas.width){
-    
-    chimeila.birth=true;
+    bo=1;
     if(chimeila.vx>0) chimeila.vx=-chimeila.vx;
   }
   if(chimeila.y-chimeila.radius<=0){
-    
-    chimeila.birth=true;
+    bo=1;
     if(chimeila.vy<0) chimeila.vy=-chimeila.vy;
   }
   if(chimeila.y+chimeila.radius>=canvas.height){
-    
-    chimeila.birth=true;
+    bo=1;
     if(chimeila.vy>0) chimeila.vy=-chimeila.vy;
+  }
+  if(bo==0){
+    chimeila.birth=false;
   }
   chimeila.x+=chimeila.vx;
   chimeila.y+=chimeila.vy; 
