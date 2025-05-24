@@ -24,11 +24,77 @@ function complexDivid(z1,z2){
   ans[1]/=(u*u+v*v);
   return ans;
 }
+function projection(z,z1,z2){
+  let tmp=complexDivid(complexDivid(complexMinus(z2,z1),complexDivid(complexMinus(z,z1),complexMinus(z2,z1))),[complexAbs(complexMinus(z2,z1))*complexAbs(complexMinus(z2,z1))/(complexAbs(complexMinus(z,z1))*complexAbs(complexMinus(z,z1))),0]);
+  return complexDivid(complexAdd(complexAdd(tmp,z1),z),[2,0]);
+}
 function reflect(z1,z2){
   if(z1[0]==0&&z1[1]==0){
     return [0,0];
   }
   return complexCross(complexCross(complexDivid(z2,z1),z2),[(complexAbs(z1)/complexAbs(z2))*(complexAbs(z1)/complexAbs(z2)),0]);
+}
+function dot(z1,z2){
+  return z1[0]*z2[0]+z1[1]*z2[1];
+}
+
+//chimeila從z1->z2逆時針方向撞到z1->z2 ? 反射,return 碰撞點 : return 0
+function reflectProMax(chimeila,z1,z2){
+  if(complexDivid(complexMinus([chimeila.x,chimeila.y],z1),complexMinus(z2,z1))[0]>=0 && complexDivid(complexMinus([chimeila.x,chimeila.y],z1),complexMinus(z2,z1))[1]>=0){
+    
+    if(complexDivid(complexMinus([chimeila.x,chimeila.y],z2),complexMinus(z2,z1))[0]<=0&&complexDivid(complexMinus([chimeila.x,chimeila.y],z2),complexMinus(z2,z1))[1]>=0){
+      
+      let ans=projection([chimeila.x,chimeila.y],z1,z2);
+      if(complexAbs(complexMinus(ans,[chimeila.x,chimeila.y]))<=chimeila.radius){
+        if(complexDivid([chimeila.vx,chimeila.vy],complexMinus(z2,z1))[1]<=0){
+          let v=reflect([chimeila.vx,chimeila.vy],complexMinus(z2,z1));
+          chimeila.vx=v[0];
+          chimeila.vy=v[1];
+          return ans;
+        }
+      }
+    }
+  }
+  return 0;
+}
+//懶得寫註解，麻煩死了，自己看
+function dotReflect(chimeila,z,z1,z2){
+  let d=complexMinus([chimeila.x,chimeila.y],z);
+  if(complexAbs(d)>chimeila.radius){
+    return 0;
+  }
+  let u=complexDivid(complexDivid(d,z1),[complexAbs(d)/complexAbs(z1),0]);
+  let v=complexDivid(complexDivid(z2,z1),[complexAbs(z2)/complexAbs(z1),0]);
+  if(v[1]>=0&&v[0]<=u[0]){
+    let ans=reflectProMax(chimeila,complexAdd(complexCross(d,[0,1]),z),complexAdd(complexCross(d,[0,-1]),z));
+    if(ans===0){
+      return 0;
+    }
+    return d;
+  }
+  if(v[1]<=0&&v[0]>=u[0]){
+    let ans=reflectProMax(chimeila,complexAdd(complexCross(d,[0,1]),z),complexAdd(complexCross(d,[0,-1]),z));
+    if(ans===0){
+      return 0;
+    }
+    return d;
+  }
+  return 0;
+}
+function fall(chimeila){
+  let a=[(canvas.width-fallWidth)/2,(canvas.height+fallWidth)/2];
+  let b=[(canvas.width-fallWidth)/2,(canvas.height-fallWidth)/2];
+  let c=[(canvas.width+fallWidth)/2,(canvas.height-fallWidth)/2];
+  let d=[(canvas.width+fallWidth)/2,(canvas.height+fallWidth)/2];
+  
+  reflectProMax(chimeila,b,a);
+  reflectProMax(chimeila,c,b);
+  reflectProMax(chimeila,d,c);
+  reflectProMax(chimeila,a,d);
+  dotReflect(chimeila,a,[0,1],[-1,0]);
+  dotReflect(chimeila,b,[-1,0],[0,-1]);
+  dotReflect(chimeila,c,[0,-1],[1,0]);
+  dotReflect(chimeila,d,[1,0],[0,1]);
 }
 //畫出sea-bao並更新座標(為防止一些神秘的bug，撞牆反彈是在這判斷)
 function f(chimeila){
@@ -56,6 +122,7 @@ function f(chimeila){
   if(bo==0){
     chimeila.birth=false;
   }
+  fall(chimeila);
   chimeila.x+=chimeila.vx;
   chimeila.y+=chimeila.vy; 
   ctx.beginPath();
@@ -63,22 +130,23 @@ function f(chimeila){
   ctx.fillStyle = chimeila.teams=="pl0"?"blue":"red";
   ctx.fill();
   
-  const img = new Image();
-  img.src=chimeila.img;
+  let img=imgMap[chimeila.img];
   ctx.drawImage(img,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
-  ctx.closePath();
+  
   ctx.font = "20px Arial";
   ctx.textAlign = "center";
   ctx.fillStyle = "black";
 
   ctx.fillText(`${chimeila.hp}`, chimeila.x-chimeila.radius/2, chimeila.y+chimeila.radius+20);
   ctx.fillText(`${chimeila.atk}`, chimeila.x+chimeila.radius/2, chimeila.y+chimeila.radius+20);
+  ctx.closePath();
   if(chimeila.vx==0&&chimeila.vy==0){
     
     return 0;
   }
   return 1;
 }
+
 //更新速度(為防止一些神秘的bug，撞牆反彈是在f判斷)
 function g(chimeila){
   if(chimeila.death===true){
@@ -221,9 +289,14 @@ socket.on("move", (data)=>{
 socket.on("play", (data)=>{
   gameData=data;
   let tmp;
+    
+  
+  
+  
   while(tmp=gameData.extra.pop()){
     
     if(gameData[tmp.teams]["chimeilas"][tmp.numberInTeams].inExtraStack==true){
+      gameData[tmp.teams]["chimeilas"][tmp.numberInTeams].inExtraStack=false;
       gameData.nowExtra=gameData[tmp.teams]["chimeilas"][tmp.numberInTeams];
       gameData.nowChimeila=gameData[tmp.teams]["chimeilas"][tmp.numberInTeams];
       gameData.now=gameData.nowExtra.teams;
@@ -239,10 +312,35 @@ socket.on("play", (data)=>{
   
 });
 function extraPlay(){
+  let img=imgMap["./img/purpleFall.jpg"];
+  ctx.beginPath();
+  ctx.drawImage(img,(canvas.width-fallWidth)/2,(canvas.height-fallWidth)/2,fallWidth,fallWidth);
+  
+  ctx.arc(canvas.width/2, canvas.height/2, gameData.nowExtra.radius, 0, Math.PI * 2);
+  ctx.fillStyle = gameData.nowExtra.teams=="pl0"?"blue":"red";
+  ctx.fill();
+  
+  img=imgMap[gameData.nowExtra.img];
+  ctx.drawImage(img,canvas.width/2-gameData.nowExtra.radius, canvas.height/2-gameData.nowExtra.radius, gameData.nowExtra.radius*2,gameData.nowExtra.radius*2);
+  ctx.closePath();
   if(self!=gameData.now){
 
     return;
   }
+  ctx.beginPath();
+  let chimeila=gameData.nowExtra;
+  ctx.arc(chimeila.x, chimeila.y, chimeila.radius*1.1, 0, Math.PI * 2);
+  ctx.fillStyle="rgb(137, 34, 192)";
+  ctx.fill();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.arc(chimeila.x, chimeila.y, chimeila.radius, 0, Math.PI * 2);
+  ctx.fillStyle = chimeila.teams=="pl0"?"blue":"red";
+  ctx.fill();
+  
+  img=imgMap[chimeila.img];
+  ctx.drawImage(img,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
+  ctx.closePath();
   canvas.addEventListener("mousedown", extraChoose);
   canvas.addEventListener("touchstart", extraChoose);
 }
@@ -263,6 +361,11 @@ function extraChoose(e){
   
 }
 function play(){
+  let img=imgMap[(gameData.now=="pl0"?"./img/blueFall.jpg":"./img/redFall.jpg")];
+  ctx.beginPath();
+  ctx.drawImage(img,(canvas.width-fallWidth)/2,(canvas.height-fallWidth)/2,fallWidth,fallWidth);
+  
+  ctx.closePath();
   let bo=true;
   for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
     bo=bo && gameData["pl0"]["chimeilas"][i].cd;
@@ -281,6 +384,24 @@ function play(){
   }
   if(self!=gameData["now"]){
     return;
+  }
+  for(let i=0;i<gameData[self]["chimeilas"].length;i+=1){
+    if(gameData[self]["chimeilas"][i].death!==true && gameData[self]["chimeilas"][i].cd!==true){
+      ctx.beginPath();
+      let chimeila=gameData[self]["chimeilas"][i];
+      ctx.arc(chimeila.x, chimeila.y, chimeila.radius*1.2, 0, Math.PI * 2);
+      ctx.fillStyle="rgb(137, 34, 192)";
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.arc(chimeila.x, chimeila.y, chimeila.radius, 0, Math.PI * 2);
+      ctx.fillStyle = chimeila.teams=="pl0"?"blue":"red";
+      ctx.fill();
+  
+      img=imgMap[chimeila.img];
+      ctx.drawImage(img,chimeila.x-chimeila.radius,chimeila.y-chimeila.radius,2*chimeila.radius,2*chimeila.radius);
+      ctx.closePath();
+    }
   }
   canvas.addEventListener("mousedown", choose);
   canvas.addEventListener("touchstart", choose);
@@ -337,7 +458,30 @@ function meow(e){
 }
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let img;
+  ctx.beginPath();
+  if(gameData.nowExtra!==null){
+    img="./img/purpleFall.jpg";
+    img=imgMap[img];
   
+    ctx.drawImage(img,(canvas.width-fallWidth)/2,(canvas.height-fallWidth)/2,fallWidth,fallWidth);
+    ctx.arc(canvas.width/2, canvas.height/2, gameData.nowExtra.radius, 0, Math.PI * 2);
+    ctx.fillStyle = gameData.nowExtra.teams=="pl0"?"blue":"red";
+    ctx.fill();
+  
+    img=imgMap[gameData.nowExtra.img];
+    ctx.drawImage(img,canvas.width/2-gameData.nowExtra.radius, canvas.height/2-gameData.nowExtra.radius, gameData.nowExtra.radius*2,gameData.nowExtra.radius*2);
+  
+  }
+  else{
+    img=(gameData.now=="pl0"?"./img/blueFall.jpg":"./img/redFall.jpg");
+    img=imgMap[img];
+  
+    ctx.drawImage(img,(canvas.width-fallWidth)/2,(canvas.height-fallWidth)/2,fallWidth,fallWidth);
+  }
+  
+  
+  ctx.closePath();
   for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
     
     g(gameData["pl0"]["chimeilas"][i]);
@@ -355,10 +499,10 @@ function draw() {
   for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
     leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].querySelector(".hp").textContent=`hp:${gameData["pl0"]["chimeilas"][i].hp}\natk:${gameData["pl0"]["chimeilas"][i].atk}`;
     if(gameData["pl0"]["chimeilas"][i].cd==true){
-      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
+      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
     }
     else{
-      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
+      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
     
     }
   }
@@ -366,11 +510,11 @@ function draw() {
     
     rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].querySelector(".hp").textContent=`hp:${gameData["pl1"]["chimeilas"][i].hp}\natk:${gameData["pl1"]["chimeilas"][i].atk}`;
     if(gameData["pl1"]["chimeilas"][i].cd==true){
-      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
+      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
     }
     
     else{
-      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
+      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
     
     }
   }
@@ -398,6 +542,7 @@ function draw() {
     else{
       gameData.nowExtra=null;
       gameData.now=(gameData.now=="pl0"?"pl1":"pl0");
+      
       socket.emit("roundEnd",gameData);
     }
   }

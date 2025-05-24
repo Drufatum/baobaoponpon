@@ -1,5 +1,5 @@
 let myName="";
-
+let fallWidth=200;
 let self="";
 let opponent="";
 let injuryTime=false;
@@ -62,7 +62,7 @@ const bubbleBao={
   radius:30,
   c:"blue",
   hp:80,
-  atk:15,
+  atk:1500,
   special:"seele",
   inExtraStack:false,
   buff:{},
@@ -236,11 +236,25 @@ let specialParameter={
     
   }
 }
+let imgMap={};
+allChimeilas.forEach(elem=>{
+  let img = new Image();
+  img.src=elem.img;
+  imgMap[elem.img]=img;
+  
+})
+let otherImgs=["./img/redFall.jpg","./img/blueFall.jpg","./img/purpleFall.jpg"];
+otherImgs.forEach(elem=>{
+  let img = new Image();
+  img.src=elem;
+  imgMap[elem]=img;
+})
 function renew(chimeila){
   for(let i in specialParameter[chimeila.special]){
     chimeila[i]=specialParameter[chimeila.special][i];
   }
 }
+
 /*
 let a={
   b:{

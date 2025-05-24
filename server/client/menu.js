@@ -1,6 +1,9 @@
 let myId="";
+let rickRoll=0;
+let rickRollBo=false;
 //catchI是捉i的意思
 function catchI(data){
+    
     document.querySelectorAll(".room").forEach(elem=>{
         document.getElementById("room").removeChild(elem);
     });
@@ -11,6 +14,7 @@ function catchI(data){
             cancel.textContent="cancel";
             cancel.classList.add("room");
             cancel.addEventListener("click",()=>{
+                rickRoll-=1;
                 for(let j=i;j<data.length-1;j++){
                     for(let k in data[j]){
                         data[j][k]=data[j+1][k];
@@ -33,19 +37,31 @@ function catchI(data){
 };
 //可莉
 function clear(){
+    rickRoll=0;
     socket.emit("clear","bomb");
 }
-document.getElementById("createRoom").addEventListener("click",()=>{
+function qlipoth(){
+    rickRoll+=1;
     let name="genshin";
+    if(rickRoll>=10){
+      document.getElementById("createRoom").removeEventListener("click",qlipoth);
+      document.getElementById("createRoom").addEventListener("click",()=>{
+        window.location.href = "https://youtu.be/ALiLGgn3YGM?si=5uvtB98-tdwFNkA7";
+      })
+      document.getElementById("createRoom").textContent="don't click me!!!";
+      
+      
+    }
     socket.emit("createRoom",name);
-});
+}
+document.getElementById("createRoom").addEventListener("click",qlipoth);
 document.getElementById("clear").addEventListener("click",clear);
 socket.on("yourId",(data)=>{
     myId=data;
 });
 socket.on("catchI",catchI);
 socket.on("gameStart",(data)=>{
-
+  rickRoll=0;
   if(data["pl1"]["id"]==myId){
     self="pl1";
     opponent="pl0";
@@ -127,10 +143,6 @@ socket.on("gameStart",(data)=>{
   
   
 });
-const rickRoll=document.getElementById("it's a secret");
-rickRoll.addEventListener("click",()=>{
-    window.location.href = "https://youtu.be/ALiLGgn3YGM?si=5uvtB98-tdwFNkA7";
-})
 
 /*
 值得一提的bug
@@ -145,6 +157,7 @@ rickRoll.addEventListener("click",()=>{
 如果我讓函式多遞迴個幾圈，則a會被畫出來，等遞迴圈數足夠多時b才會被畫出來
 並且這個問題"只會"在最初幾幀出現，也對後續畫面沒有任何影響，也就是即便前幾幀a和A的速度沒對上，後面卻被矯正回來了，在最後一幀也沒因為函式終止而來不及畫出最後一張a
 修正：requestAnimationFrame
+更:requestAnimationFrame根本沒解決問題，單純只是因為我加幀數而已
 
 3.socket傳送物件：某物件a如果有屬性是指向自己，例如
 let a={
@@ -168,6 +181,10 @@ function似乎也有同的問題，但我沒想出原因，猜測是因為怕函
 
 1.完全彈性碰撞真的反直覺：入射角!=反射角、垂直撞擊時速度會被完全吃掉
 2.如果兩個玩家沒用完全相同的順序進行碰撞判定，大概兩輪後畫面就完全不同了
+
+技能說明:
+額外回合觸發順序是stack，並且stack裡面不會有重複的角色，死亡會移除拉條效果
+
 
 
 */ 
