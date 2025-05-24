@@ -248,7 +248,7 @@ function extraPlay(){
 }
 function extraChoose(e){
   let rect=canvas.getBoundingClientRect();
-  let z=[e.clientX - rect.left,e.clientY - rect.top];
+  let z=[(e.clientX - rect.left)*canvas.width/canvas.clientWidth,(e.clientY - rect.top)*canvas.Height/canvas.clientHeight];
   let chi=gameData.nowExtra;
   gameData.now=chi.teams;
   if(complexAbs(complexMinus(z,[chi.x,chi.y]))<chi.radius){
@@ -288,7 +288,7 @@ function play(){
 }
 function choose(e){
   let rect=canvas.getBoundingClientRect();
-  let z=[e.clientX - rect.left,e.clientY - rect.top];
+  let z=[(e.clientX - rect.left)*canvas.width/canvas.clientWidth,(e.clientY - rect.top)*canvas.Height/canvas.clientHeight];
   const chi=gameData[self]["chimeilas"];
   for(let i=0;i<chi.length;i+=1){
     
@@ -309,7 +309,7 @@ function choose(e){
 function meow(e){
   
   let rect=canvas.getBoundingClientRect();
-  let z=[(e.clientX || e.changedTouches.clientX) - rect.left,(e.clientY || e.changedTouches.clientY) - rect.top] ;
+  let z=[(e.clientX - rect.left)*canvas.width/canvas.clientWidth,(e.clientY - rect.top)*canvas.Height/canvas.clientHeight]
   let r=complexAbs([(gameData["nowChimeila"].x-z[0])/30,(gameData["nowChimeila"].y-z[1])/30]);
   if(r<gameData["nowChimeila"].radius/30){
     document.removeEventListener("mouseup", meow);
