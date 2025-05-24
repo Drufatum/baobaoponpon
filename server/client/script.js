@@ -1,17 +1,3 @@
-const socket = io(
-    location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "https://baobaoponpon-si87.onrender.com"
-);
-// 取得畫布與繪圖上下文
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-const epsilon =0.00001;
-
-
-
-
-
 function complexAbs(z){
   return Math.sqrt(z[0]*z[0]+z[1]*z[1]);
 }
@@ -207,13 +193,16 @@ socket.on("initInformation",(data)=>{
     tmp.style.top=`${elem.numberInTeams*100/3}%`;
     tmp.style.left="0%";
     tmp.style.width="100%";
+    leftChi[elem.numberInTeams]=tmp;
     document.getElementById("blueChimeilas").appendChild(tmp);
+    
   });
   gameData["pl1"]["chimeilas"].forEach(elem => {
     let tmp=chimeilaInformation(elem);
     tmp.style.top=`${elem.numberInTeams*100/3}%`;
     tmp.style.left="0%";
     tmp.style.width="100%";
+    rightChi[elem.numberInTeams]=tmp;
     document.getElementById("redChimeilas").appendChild(tmp);
   });
   
@@ -221,16 +210,76 @@ socket.on("initInformation",(data)=>{
 })
 socket.on("move", (data)=>{
   gameData=data;
+  if(gameData.nowChimeila!==null){
+    gameData.nowChimeila=gameData[gameData.nowChimeila.teams]["chimeilas"][gameData.nowChimeila.numberInTeams];
+  }
+  if(gameData.nowExtra!==null){
+    gameData.nowExtra=gameData[gameData.nowExtra.teams]["chimeilas"][gameData.nowExtra.numberInTeams];
+  }
   requestAnimationFrame(draw);
 });
 socket.on("play", (data)=>{
   gameData=data;
-  play();
-});
-function play(){
+  let tmp;
+  while(tmp=gameData.extra.pop()){
+    
+    if(gameData[tmp.teams]["chimeilas"][tmp.numberInTeams].inExtraStack==true){
+      gameData.nowExtra=gameData[tmp.teams]["chimeilas"][tmp.numberInTeams];
+      gameData.nowChimeila=gameData[tmp.teams]["chimeilas"][tmp.numberInTeams];
+      gameData.now=gameData.nowExtra.teams;
+      extraPlay();
+      return;
+    }
+    
+  }
   
+  play();
+
+
+  
+});
+function extraPlay(){
+  if(self!=gameData.now){
+
+    return;
+  }
+  canvas.addEventListener("mousedown", extraChoose);
+  canvas.addEventListener("touchstart", extraChoose);
+}
+function extraChoose(e){
+  let rect=canvas.getBoundingClientRect();
+  let z=[e.clientX - rect.left,e.clientY - rect.top];
+  let chi=gameData.nowExtra;
+  gameData.now=chi.teams;
+  if(complexAbs(complexMinus(z,[chi.x,chi.y]))<chi.radius){
+      
+      gameData["nowChimeila"]=chi;
+
+      document.addEventListener("mouseup", meow);
+      document.addEventListener("touchend", meow);
+      return;
+  }
+  
+  
+}
+function play(){
+  let bo=true;
+  for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    bo=bo && gameData["pl0"]["chimeilas"][i].cd;
+  }
+    
+  
+  for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    gameData["pl0"]["chimeilas"][i].cd=(gameData["pl0"]["chimeilas"][i].cd && (!bo));
+  }
+  bo=true;
+  for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
+    bo=bo && gameData["pl1"]["chimeilas"][i].cd;
+  }
+  for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
+    gameData["pl1"]["chimeilas"][i].cd=(gameData["pl1"]["chimeilas"][i].cd && (!bo));
+  }
   if(self!=gameData["now"]){
-    document.getElementById("round").textContent="opponent";
     return;
   }
   canvas.addEventListener("mousedown", choose);
@@ -244,7 +293,9 @@ function choose(e){
   for(let i=0;i<chi.length;i+=1){
     
     if(chi[i].death!==true && complexAbs(complexMinus(z,[chi[i].x,chi[i].y]))<chi[i].radius){
-      
+      if(chi[i].cd===true){
+        continue;
+      }
       gameData["nowChimeila"]=chi[i];
 
       document.addEventListener("mouseup", meow);
@@ -265,6 +316,8 @@ function meow(e){
     document.removeEventListener("touchend", meow);
     return;
   }
+  if(gameData.nowExtra===null)gameData["nowChimeila"].cd=true;
+  renew(gameData["nowChimeila"]);
   gameData["nowChimeila"].vx=(gameData["nowChimeila"].x-z[0])/30;
   gameData["nowChimeila"].vy=(gameData["nowChimeila"].y-z[1])/30;
   
@@ -299,6 +352,28 @@ function draw() {
   for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
     bo+=f(gameData["pl1"]["chimeilas"][i]);
   }
+  for(let i=0;i<gameData["pl0"]["chimeilas"].length;i+=1){
+    leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].querySelector(".hp").textContent=`hp:${gameData["pl0"]["chimeilas"][i].hp}\natk:${gameData["pl0"]["chimeilas"][i].atk}`;
+    if(gameData["pl0"]["chimeilas"][i].cd==true){
+      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
+    }
+    else{
+      leftChi[gameData["pl0"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
+    
+    }
+  }
+  for(let i=0;i<gameData["pl1"]["chimeilas"].length;i+=1){
+    
+    rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].querySelector(".hp").textContent=`hp:${gameData["pl1"]["chimeilas"][i].hp}\natk:${gameData["pl1"]["chimeilas"][i].atk}`;
+    if(gameData["pl1"]["chimeilas"][i].cd==true){
+      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(137, 34, 192)";
+    }
+    
+    else{
+      rightChi[gameData["pl1"]["chimeilas"][i].numberInTeams].style.backgroundColor = "rgb(182, 115, 21)";
+    
+    }
+  }
   if(bo!=0){
     requestAnimationFrame(draw);
   }
@@ -321,8 +396,8 @@ function draw() {
       requestAnimationFrame(draw);
     }
     else{
+      gameData.nowExtra=null;
       gameData.now=(gameData.now=="pl0"?"pl1":"pl0");
-    
       socket.emit("roundEnd",gameData);
     }
   }
@@ -347,6 +422,11 @@ function pon(toby,ems){
   if(ems.hp<=0){
     die(ems);
   }
+  
+  specialAbility[toby.special](toby,ems);
+  specialAbility[ems.special](ems,toby);
+  //ems.relive.specialAbility(ems,toby);
+  
 }
 function die(chimeila){
   let ghost={};
@@ -398,7 +478,6 @@ function win(){
   document.getElementById("menu").style.display="block";
   socket.emit("gameover",gameData);
 }
-
 //bug:合成，復活卡牆裡
 //不講武德，隨時傷害判定
 

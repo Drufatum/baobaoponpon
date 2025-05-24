@@ -9,8 +9,21 @@ let gameData={
   pl1:{},
   nowChimeila:null,
   winner:"",
-  now:"pl0"
+  now:"pl0",
+  extra:[],
+  nowExtra:null
+
 };
+const socket = io(
+    location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://baobaoponpon-si87.onrender.com"
+);
+// 取得畫布與繪圖上下文
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+const epsilon =0.00001;
+
 const commonBao={
   name:"common bao",
   teams:null,
@@ -25,12 +38,15 @@ const commonBao={
   c:"blue",
   hp:80,
   atk:15,
-  specialAbility:{},
+  special:"commonJpg",
+  inExtraStack:false,
   buff:{},
   debuff:{},
   relive:"self,but not self.who i am?it is a question.",
   death:false,
   birth:false,
+  cd:false,
+  information:null,
   img:"./img/fly.png"
 };
 const bubbleBao={
@@ -47,12 +63,14 @@ const bubbleBao={
   c:"blue",
   hp:80,
   atk:15,
-  specialAbility:{},
+  special:"seele",
+  inExtraStack:false,
   buff:{},
   debuff:{},
   relive:"self,but not self.who i am?it is a question.",
   death:false,
   birth:false,
+  cd:false,
   img:"./img/bubble.png"
 };
 const bronyaBao={
@@ -69,13 +87,19 @@ const bronyaBao={
   c:"blue",
   hp:80,
   atk:15,
-  specialAbility:{},
+
+  special:"pullStrip",
+  abilityCd:false,
+
+  inExtraStack:false,
+
   buff:{},
   debuff:{},
   relive:"self,but not self.who i am?it is a question.",
   death:false,
   birth:false,
-  img:"./img/fly.png"
+  cd:false,
+  img:"./img/bronya.png"
 };
 const flyBao={
   name:"fly bao",
@@ -91,12 +115,14 @@ const flyBao={
   c:"blue",
   hp:80,
   atk:15,
-  specialAbility:{},
   buff:{},
   debuff:{},
+  special:"fly",
+  inExtraStack:false,
   relive:"self,but not self.who i am?it is a question.",
   death:false,
   birth:false,
+  cd:false,
   img:"./img/fly.png"
 };
 
@@ -149,9 +175,84 @@ function chimeilaInformation(chimeila){
   information.appendChild(tmp);
   return information;
 }
+let leftChi=[{},{},{}];
+let rightChi=[{},{},{}];
 let graveyard=[];
+function giveExtraRound(chimeila){
+  let tmp={
+    teams:chimeila.teams,
+    numberInTeams:chimeila.numberInTeams
+  }
+  gameData.extra.push(tmp);
+  chimeila.inExtraStack=true;
+}
+function commonJpg(common,another){
+  
+}
+function pullStrip(bronya,another){
+  if(gameData.nowExtra!==null){
+    return 0;
+  }
+  if(bronya===gameData.nowChimeila){
+    //alert("bronya will no longer use bronya to express misaka misaka");
+    if(bronya.abilityCd==true){
+      return 0;
+    }
+    bronya.abilityCd=true;
+    if(bronya.teams!=another.teams){
+      return 0;
+    }
+    giveExtraRound(another);
+    return 1;
+  }
+}
+function seele(seele,another){
+  if(another.death==true && another.teams!=seele.teams){
+    giveExtraRound(seele);
+    return 1;
+  }
+  return 0;
+}
+function fly(fly,another){
 
-
+}
+let specialAbility={
+  commonJpg:commonJpg,
+  pullStrip:pullStrip,
+  seele:seele,
+  fly:fly
+}
+let specialParameter={
+  commonJpg:{
+    
+  },
+  pullStrip:{
+    abilityCd:false
+  },
+  seele:{
+    
+  },
+  fly:{
+    
+  }
+}
+function renew(chimeila){
+  for(let i in specialParameter[chimeila.special]){
+    chimeila[i]=specialParameter[chimeila.special][i];
+  }
+}
+/*
+let a={
+  b:{
+    c:"woc"
+  }
+}
+let p={};
+for(let i in a){
+  p[i]=a[i];
+}
+p["b"].c="genshin";
+alert(a["b"].c);*/
 
 //object-fit: cover; （可選 cover、contain、fill） overflow: hidden;
 

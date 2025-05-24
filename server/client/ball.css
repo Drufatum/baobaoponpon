@@ -1,22 +1,28 @@
 
-
-canvas {
+#myCanvas {
     border: 2px solid #ccc;
     background-color: #fdfdfd;
-    display: block;
+    position:absolute;
+    top:15%;
+    left:22%;
+    width: 56%;
+    aspect-ratio: 8 / 5;
 }
 .menu{
   display: block;
 }
-.game{
+#game{
   display:None;
-  border:solid 0px;
+  border:solid 1px;
+  margin: -1px;
   position: absolute;
-  left:calc(50% - 796.5px);
-  width: 1593px;
-  height:1110px;
+  left:0;
+  top:0;
+
+  width: 100%;
+  height:100%;
 }
-.select{
+#select{
   display:None;
 }
 .chimeila{
@@ -97,23 +103,23 @@ canvas {
       aspect-ratio: 2 / 3;
 }
 #leftBookShelf{
-  background-color:  rgba(161, 99, 7, 0.6);
-      border:solid 1px;
+  background-color:  rgba(0, 0, 0, 1);
+      border:solid 2px;
       position: absolute;
       top:15%;
-      left: calc(50% - 800px);
-      height: 555px;
-      width: 74px;
-
+      left: 0;
+      width: 4.5%;
+      aspect-ratio: 9/70;
 }
 #rightBookShelf{
-  background-color:  rgba(161, 99, 7, 0.6);
-      border:solid 1px;
+  background-color:  rgba(0 ,0 ,0 ,1);
+      border:solid 2px;
       position: absolute;
       top:15%;
-      left: calc(50% + 724px);
-      height: 555px;
-      width: 74px;
+      left: 95.5%;
+      
+      width: 4.5%;
+      aspect-ratio: 9 / 70;
 
 }
 
@@ -122,33 +128,23 @@ canvas {
     
     
     
-    #myCanvas{
-      border:solid 2px;
-      position: absolute;
-      top:15%;
-      left: calc(50% - 446px);
-      width: 888px;
-      
-      aspect-ratio: 8 / 5;
-    }
     
     #redChimeilas{
-      background-color:  rgba(3, 16, 40, 0.6);
-      border:solid 2px;
+      border:solid 2px ;
+
       position: absolute;
       top:15%;
-      left: calc(50% + 444px);
-      height: 555px;
+      left: 78%;
+      width: 17.5%;
       aspect-ratio: 1 / 2;
       
     }
     #blueChimeilas{
-      background-color:  rgba(3, 16, 40, 0.6);
       border:solid 2px;
       position: absolute;
       top:15%;
-      left: calc(50% - 725.5px);
-      height: 555px;
+      left: 4.5%;
+      width:17.5%;
       aspect-ratio: 1 / 2;
       
     }

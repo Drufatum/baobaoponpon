@@ -52,6 +52,9 @@ io.on("connection", (socket) => {
   
   console.log("有玩家連線");
   
+
+
+
   io.to(socket.id).emit("yourId",socket.id);
   io.to(socket.id).emit("catchI", rooms);
   
@@ -93,7 +96,9 @@ io.on("connection", (socket) => {
       },
       nowChimeila:null,
       winner:"",
-      now:"pl0"
+      now:"pl0",
+      extra:[],
+      nowExtra:null
     };
     games[gameId]=game;
     if(trueRedTrueBlue==0){
@@ -117,9 +122,11 @@ io.on("connection", (socket) => {
     socket.on("roundEnd", (data) => {
       if(roundCheck==0){
         roundCheck=1;
+        console.log ("woc");
       }
       else{
         roundCheck=0;
+        console.log("woc genshin");
         io.to(gameId).emit("play", data);
         
       }
@@ -128,9 +135,11 @@ io.on("connection", (socket) => {
     another.on("roundEnd", (data) => {
       if(roundCheck==0){
         roundCheck=1;
+        console.log("woc");
       }
       else{
         roundCheck=0;
+        console.log("woc genshin");
         io.to(gameId).emit("play", data);
         
       }
@@ -149,7 +158,6 @@ io.on("connection", (socket) => {
       
     });
     another.on("ready", (data) => {
-      console.log("wow");
       game[data["teams"]]=data;
       
       if(readyCheck==0){      

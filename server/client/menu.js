@@ -58,13 +58,8 @@ socket.on("gameStart",(data)=>{
     document.getElementById("game").style.backgroundColor="rgba(154, 212, 249, 0.85)";
     
   }
-  document.querySelectorAll(".menu").forEach(elem=>{
-    elem.style.display="None";
-  });
-  document.querySelectorAll(".select").forEach(elem=>{
-    elem.style.display="block";
-  });
-  
+  document.getElementById("menu").style.display="None";
+  document.getElementById("select").style.display="block";
   const final=new Set();
   let submit=document.createElement("button");
   submit.textContent="sure";
@@ -92,12 +87,7 @@ socket.on("gameStart",(data)=>{
         document.getElementById("select").removeChild(elem);
     });
     document.getElementById("select").style.display="None";
-    document.querySelectorAll(".game").forEach(elem=>{
-        elem.style.display="block";
-        let canvas = document.getElementById("myCanvas");
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-    });
+    document.getElementById("game").style.display="block";
 
     socket.emit("ready",data[self]);
   })
@@ -142,40 +132,42 @@ rickRoll.addEventListener("click",()=>{
     window.location.href = "https://youtu.be/ALiLGgn3YGM?si=5uvtB98-tdwFNkA7";
 })
 
+/*
+值得一提的bug
+
+1.碰撞反彈：原本寫的反彈邏輯是，當兩個圓有交點時，交換正向速度，
+但如果兩個球沒在一幀內分開（觸發條件為其中一顆球在這一幀內發生兩次碰撞，這導致原本該分離的兩球並未如期分離），
+會導致兩球再交換一次正向速度，進而兩顆球融合在一起（舉例來說A{x:-1 r:1 v:-1}和B(x:1 r:1 v:1)被視作發生碰撞，並交換了v，而這反而使兩球更接近）
+修正：兩圓相交且正向速度為追撞或相撞才視作發生碰撞
+
+2.第一幀畫面會出問題：如果是畫一張圖的話，canvas似乎會“來不及畫”，這問題用requestAnimationFrame就可解決，我沒搞懂的是在沒用requestAnimationFrame時到底發生了什麼事
+簡化一下狀況，我在canvas中依序畫了AaBb，其中AB是純上色，ab則是畫圖，在第一幀只有AB被畫出來，也就是說，並不是一個畫完才開始畫下一個，
+如果我讓函式多遞迴個幾圈，則a會被畫出來，等遞迴圈數足夠多時b才會被畫出來
+並且這個問題"只會"在最初幾幀出現，也對後續畫面沒有任何影響，也就是即便前幾幀a和A的速度沒對上，後面卻被矯正回來了，在最後一幀也沒因為函式終止而來不及畫出最後一張a
+修正：requestAnimationFrame
+
+3.socket傳送物件：某物件a如果有屬性是指向自己，例如
+let a={
+  s:"genshin"
+}
+let b={
+  c:a
+}
+a.d=b;
+在本地可執行alert(a.d.c.s);
+但若先把a寄到伺服器再寄回來，則無法運行，原因應該是當socket.emit在寄送物件時，是先直接複製所有基本型態，遇到物件則往下遞迴，沒有任何指標的概念，所以發生無限迴圈
+function似乎也有同的問題，但我沒想出原因，猜測是因為怕函式內部用到全域變數或一些無法預測的操作，所以乾脆禁止函式的傳送(但按javascript的風格，應該會先試著傳看看，出問題再說，
+而事實上，連最簡單的alert都傳不過去，所以我感覺應該有其他原因)
+修正：在本地開一個map存物件，在傳送時不傳送物件，而改傳送物件在map中的key，只要維護好雙方map一致，就是在變相使用指標(chimeila.relive是當初留下的歷史遺毒，但我不太敢改，出事再說)
+
+
+*/
 
 /*
-目前缺匹配成功到對局中間的轉場，預期效果如下(總經原還在追我!?)
-以上面那個socket.on開始，data內為[creatorId,playerId](可以自己去server.js改掉，這我測試用的而已)
-選海豹、決定先後手，伺服器端應判斷兩人是否皆準備完成(我淺判過了)
-伺服器端emit("move",gameData)
-let gameData={
-  id:"",
-  pl0:toby,
-  pl1:ems,
-  nowChimeila:null,
-  now:"pl0"
-}
-const exampleSb={
-  name:"",
-  id:"",
-  teams:0,
-  chimeilas:[],
-}
-const exampleChimeila={
-  name:"",
-  teams:0,
-  x:canvas.width-90,
-  y:canvas.height*0.5,
-  vx:0,
-  vy:0,
-  m:100,
-  fk:0.02,
-  radius:30,
-  c:"blue",
-  hp:80,
-  atk:15,
-  specialAbility:{},
-  buff:{},
-  debuff:{}
-}
-*/
+小知識
+
+1.完全彈性碰撞真的反直覺：入射角!=反射角、垂直撞擊時速度會被完全吃掉
+2.如果兩個玩家沒用完全相同的順序進行碰撞判定，大概兩輪後畫面就完全不同了
+
+
+*/ 
