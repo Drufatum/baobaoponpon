@@ -1,5 +1,5 @@
 let myName="";
-let fallWidth=200;
+let fallWidth=360;
 let self="";
 let opponent="";
 let injuryTime=false;
@@ -33,8 +33,8 @@ const commonBao={
   vx:0,
   vy:0,
   m:100,
-  fk:0.04,
-  radius:30,
+  fk:0.2,
+  radius:54,
   c:"blue",
   hp:80,
   atk:15,
@@ -58,11 +58,11 @@ const bubbleBao={
   vx:0,
   vy:0,
   m:100,
-  fk:0.04,
-  radius:30,
+  fk:0.2,
+  radius:54,
   c:"blue",
   hp:80,
-  atk:1500,
+  atk:15,
   special:"seele",
   inExtraStack:false,
   buff:{},
@@ -82,8 +82,8 @@ const bronyaBao={
   vx:0,
   vy:0,
   m:100,
-  fk:0.04,
-  radius:30,
+  fk:0.2,
+  radius:54,
   c:"blue",
   hp:80,
   atk:15,
@@ -110,8 +110,8 @@ const flyBao={
   vx:0,
   vy:0,
   m:100,
-  fk:0.04,
-  radius:30,
+  fk:0.2,
+  radius:54,
   c:"blue",
   hp:80,
   atk:15,
@@ -125,16 +125,44 @@ const flyBao={
   cd:false,
   img:"./img/fly.png"
 };
+const hinaichiBao={
+  name:"hinaichi bao",
+  teams:null,
+  numberInTeams:NaN,
+  x:NaN,
+  y:NaN,
+  vx:0,
+  vy:0,
+  m:100,
+  fk:0.2,
+  radius:54,
+  c:"blue",
+  hp:80,
+  atk:15,
+
+  special:"ding",
+  abilityCd:false,
+
+  inExtraStack:false,
+
+  buff:{},
+  debuff:{},
+  relive:"self,but not self.who i am?it is a question.",
+  death:false,
+  birth:false,
+  cd:false,
+  img:"./img/hinaichi.png"
+};
 
 
 
 const exampleMap={
-    width:888,
-    height:555,
+    width:1600,
+    height:1000,
     numOfChimeila:3
     
 };
-const allChimeilas=[commonBao,bubbleBao,bronyaBao,flyBao];
+const allChimeilas=[commonBao,bubbleBao,bronyaBao,flyBao,hinaichiBao];
 function startPosition(chimeila,map=exampleMap){
     if(chimeila["teams"]=="pl0"){
         chimeila["x"]=-commonBao.radius;
@@ -216,11 +244,15 @@ function seele(seele,another){
 function fly(fly,another){
 
 }
+function ding(hinaichi,another){
+
+}
 let specialAbility={
   commonJpg:commonJpg,
   pullStrip:pullStrip,
   seele:seele,
-  fly:fly
+  fly:fly,
+  ding:ding
 }
 let specialParameter={
   commonJpg:{
