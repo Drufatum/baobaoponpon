@@ -252,7 +252,9 @@ function g(chimeila){
       
     }
   }
+  //allRemembrance.forEach(elem=>{
     
+  //})
 }
 socket.on("initInformation",(data)=>{
   gameData=data;
@@ -625,5 +627,4 @@ function win(){
 }
 //bug:合成，復活卡牆裡
 //不講武德，隨時傷害判定
-
 

@@ -1,0 +1,9 @@
+#myCanvas{
+    border: 2px solid #ccc;
+    background-color: #fdfdfd;
+    position:absolute;
+    top:15%;
+    left:22%;
+    width: 56%;
+    aspect-ratio: 8 / 5;
+}

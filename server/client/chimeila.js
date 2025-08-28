@@ -322,3 +322,24 @@ const exampleGame={
   nowChimeila:null,
   now:"pl0"
 }
+const exampleRemembrance={
+  name:"common bao",
+  teams:null,
+  x:NaN,
+  y:NaN,
+  vx:0,
+  vy:0,
+  m:100,
+  fk:0.2,
+  radius:54,
+  hp:80,
+  atk:15,
+  special:"commonJpg",
+  inExtraStack:false,
+  relive:"self,but not self.who i am?it is a question.",
+  death:false,
+  birth:false,
+  cd:false,
+  information:null,
+  img:"./img/fly.png"
+}
