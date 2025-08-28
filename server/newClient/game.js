@@ -7,6 +7,7 @@ class Records{
     }
     async getRecord(){
         let cipher=await this._list[this._now++];
+        return cipher;
         for(let i of this.game.cycles){
             if(complexAbs(cipher[0],i.pos)<i.r){
                 
@@ -28,7 +29,7 @@ class Game{
         this.howManyPointers=0;
         this.now;
         this.speed=5;
-        hi={
+        this.hi={
             record(msg){
                 this.records.add(msg);
             }
@@ -180,7 +181,8 @@ class PlayerRound extends Round{
             document.removeEventListener("pointerdown", this.myChoose);
             document.removeEventListener("pointermove", this.myMeow);
             document.removeEventListener("pointerup", this.myShoot);
-            this.game.hi.send(new Msg('record',[this.cipher.chimeila.pos,this.cipher.v]));
+            this.game.records.add([this.cipher.chimeila,this.cipher.v])
+            //this.game.hi.record(new Msg('record',[this.cipher.chimeila.pos,this.cipher.v]));
             //resolve([this.cipher.chimeila,this.cipher.v]);
         }
     }

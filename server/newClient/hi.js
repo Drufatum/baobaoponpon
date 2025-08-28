@@ -10,8 +10,6 @@ class Msg{
         this.value=value;
     }
 }
-let 
-}
 class Hi{
     constructor(){
         
